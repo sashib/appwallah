@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.appwallah.ideas.NewIdeaActivity">
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:textSize="14sp"
+        android:textColor="@color/light_gray"
+        android:text="@string/new_idea_label"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/label"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:layout_marginTop="10dp"
+        android:minLines="5"
+        android:lines="5"
+        android:textSize="16sp"
+        android:inputType="textAutoComplete"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="10dp"
+        android:text="@string/label_save"
+        android:textColor="@android:color/white"
+        android:background="@color/pink"/>
+</RelativeLayout>

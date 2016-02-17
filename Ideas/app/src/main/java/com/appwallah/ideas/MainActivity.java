@@ -1,5 +1,6 @@
 package com.appwallah.ideas;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -10,6 +11,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final int REQUEST_NEW_IDEA = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +25,9 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                //        .setAction("Action", null).show();
+                showNewIdea();
             }
         });
     }
@@ -48,5 +52,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void showNewIdea() {
+        Intent intent = new Intent(this, NewIdeaActivity.class);
+        startActivityForResult(intent, REQUEST_NEW_IDEA);
     }
 }

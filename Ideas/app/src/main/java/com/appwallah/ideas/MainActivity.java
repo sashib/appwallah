@@ -6,17 +6,47 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.client.AuthData;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = MainActivity.class.getName();
+
     private static final int REQUEST_NEW_IDEA = 1;
+
+    private AuthManager mAuthManager;
+    private AuthManagerListener mAuthListener = new AuthManagerListener() {
+        @Override
+        public void onAuthSuccess() {
+
+        }
+
+        @Override
+        public void onAuthFailure(int code) {
+            showLogin();
+        }
+
+        @Override
+        public void onAuthStateChanged(AuthData authData) {
+            //refresh list
+            Log.d(TAG, "auth state changed: " + authData.getUid());
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mAuthManager = new AuthManager(this, mAuthListener);
+        mAuthManager.authenticateUser();
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -58,4 +88,11 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, NewIdeaActivity.class);
         startActivityForResult(intent, REQUEST_NEW_IDEA);
     }
+
+    public void showLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+    }
+
+
 }

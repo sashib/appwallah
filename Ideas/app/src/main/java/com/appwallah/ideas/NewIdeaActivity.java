@@ -41,6 +41,7 @@ public class NewIdeaActivity extends AppCompatActivity {
 
     public void saveIdea() {
         mNewIdeaController.saveIdea(mIdeaEdit.getText().toString());
+        onBackPressed();
     }
 
 }

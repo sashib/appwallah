@@ -2,6 +2,14 @@ package com.appwallah.ideas;
 
 import android.content.Context;
 
+import com.firebase.client.Firebase;
+import com.firebase.client.ServerValue;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 public class NewIdeaController {
     Context mContext;
 
@@ -9,7 +17,30 @@ public class NewIdeaController {
         this.mContext = ctx;
     }
 
-    public void saveIdea(String txt) {
+    public ArrayList<String> getHashTags(String msg) {
+        ArrayList<String> hashTags = new ArrayList<>();
+        int hashIndex = msg.indexOf("#");
+        while (hashIndex >= 0 && hashIndex < msg.length()) {
+            String str = msg.substring(hashIndex, msg.length());
+            int spaceIndex = str.indexOf(" ");
+            String hashTag = str.substring(1, spaceIndex);
+            if (hashTag.length() > 1) {
+                hashTags.add(hashTag);
+            }
+            hashIndex = (str.indexOf("#", 1));
+
+        }
+        return hashTags;
+    }
+
+    public void saveIdea(String desc) {
+        Firebase ref = new Firebase(FireBaseConstants.FIREBASE_URL);
+        Firebase ideaRef = ref.child("ideas");
+        Firebase newIdeaRef = ideaRef.push();
+
+        Idea newIdea = new Idea(ref.getAuth().getUid(), desc);
+        newIdeaRef.setValue(newIdea);
 
     }
+
 }

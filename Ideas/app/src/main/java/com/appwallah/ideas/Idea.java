@@ -2,6 +2,7 @@ package com.appwallah.ideas;
 
 import com.firebase.client.ServerValue;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -10,8 +11,8 @@ import java.util.Map;
 public class Idea {
 
     String user_id;
-    String description;
-    Map<String, String> timestamp;
+    String desc;
+    long timestamp;
 
     public Idea() {
         init();
@@ -20,26 +21,27 @@ public class Idea {
     public Idea(String userId, String description) {
         init();
         this.user_id = userId;
-        this.description = description;
+        this.desc = description;
     }
 
     public void init() {
-        this.timestamp = ServerValue.TIMESTAMP;
+        Date dt = new Date();
+        this.timestamp = dt.getTime();
     }
 
-    public String getDescription() {
-        return description;
+    public String getDesc() {
+        return desc;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDesc(String description) {
+        this.desc = description;
     }
 
-    public Map<String, String> getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Map<String, String> timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 

@@ -21,27 +21,10 @@ public class NewIdeaController {
         this.mContext = ctx;
     }
 
-    public ArrayList<String> getHashTags(String msg) {
-        ArrayList<String> hashTags = new ArrayList<>();
-        int hashIndex = msg.indexOf("#");
-        while (hashIndex >= 0 && hashIndex < msg.length()) {
-            String str = msg.substring(hashIndex, msg.length());
-            int spaceIndex = str.indexOf(" ");
-            spaceIndex = (spaceIndex <= 0) ? str.length() : spaceIndex;
-            String hashTag = str.substring(1, spaceIndex);
-            if (hashTag.length() > 1) {
-                hashTags.add(hashTag);
-            }
-            msg = str.substring(1);
-            hashIndex = (msg.indexOf("#"));
-
-        }
-        return hashTags;
-    }
 
     public void saveIdea(String desc) {
 
-        ArrayList<String> hashtags = getHashTags(desc);
+        ArrayList<String> hashtags = HashtagManager.getHashTags(desc);
 
         Log.d(TAG, "hastags are: " + hashtags);
 

@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.Query;
 import com.firebase.ui.FirebaseRecyclerAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,7 +34,13 @@ public class MainActivity extends AppCompatActivity {
     private AuthManagerListener mAuthListener = new AuthManagerListener() {
         @Override
         public void onAuthSuccess() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //loadIdeas();
 
+                }
+            });
         }
 
         @Override
@@ -111,11 +118,15 @@ public class MainActivity extends AppCompatActivity {
         mRecycler.setHasFixedSize(true);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
 
+    }
+
+    public void loadIdeas() {
         Firebase ideaRef = mFirebaseRef.child("ideas");
+        Query queryRef = ideaRef.orderByChild("user_id").equalTo(mFirebaseRef.getAuth().getUid());
 
 
         mAdapter = new FirebaseRecyclerAdapter<Idea, IdeaViewHolder>(
-                Idea.class, R.layout.idea_item, IdeaViewHolder.class, ideaRef) {
+                Idea.class, R.layout.idea_item, IdeaViewHolder.class, queryRef) {
             @Override
             public void populateViewHolder(IdeaViewHolder ideaViewHolder, Idea idea, int position) {
                 ideaViewHolder.ideaText.setText(idea.getDesc());

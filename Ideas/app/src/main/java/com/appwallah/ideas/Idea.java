@@ -1,5 +1,6 @@
 package com.appwallah.ideas;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.firebase.client.ServerValue;
 
 import java.util.Date;
@@ -10,7 +11,8 @@ import java.util.Map;
  */
 public class Idea {
 
-    String user_id;
+    @JsonProperty("user_id")
+    String userId;
     String desc;
     long timestamp;
 
@@ -20,7 +22,7 @@ public class Idea {
 
     public Idea(String userId, String description) {
         init();
-        this.user_id = userId;
+        this.userId = userId;
         this.desc = description;
     }
 
@@ -46,12 +48,12 @@ public class Idea {
     }
 
 
-    public String getUser_id() {
-        return user_id;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    public void setUserId(String uid) {
+        this.userId = uid;
     }
 
 }

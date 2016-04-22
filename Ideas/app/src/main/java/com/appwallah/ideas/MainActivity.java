@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getName();
 
-
     private IdeasRecyclerAdapter mAdapter;
 
     private RecyclerView mRecycler;
@@ -145,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
 
         mAdapter = new IdeasRecyclerAdapter(ideas);
-        mRecycler.setAdapter(mAdapter);
     }
 
     @Override

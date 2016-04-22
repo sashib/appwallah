@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Pair;
+import android.util.Log;
 
 
 import com.appspot.ideas_staging.ideasapi.Ideasapi;
@@ -15,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NewIdeaController {
+
+    private static final String TAG = NewIdeaController.class.getName();
+
     Context mContext;
 
     public NewIdeaController(Context ctx) {

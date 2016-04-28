@@ -20,7 +20,6 @@ app.get('/', function (req, res) {
    res.sendFile(__dirname + '/public/index.html');
 });
 
-
-
-app.listen(3000);
-console.log('Listening on port 3000...');
+app.set('port', process.env.PORT || 3000);
+app.listen(app.get('port'));
+console.log('Listening on port ' + app.get('port'));

@@ -25,7 +25,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".NewIdeaActivity" />
+<<<<<<< HEAD
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login" />
+=======
 
+>>>>>>> origin/master
     </application>
 
 </manifest>

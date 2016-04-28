@@ -25,6 +25,22 @@ public class NewIdeaController {
         this.mContext = ctx;
     }
 
+<<<<<<< HEAD
+
+    public void saveIdea(String desc) {
+
+        ArrayList<String> hashtags = HashtagManager.getHashTags(desc);
+
+        Log.d(TAG, "hastags are: " + hashtags);
+
+        Firebase ref = new Firebase(FireBaseConstants.FIREBASE_URL);
+        Firebase ideaRef = ref.child("ideas");
+        Firebase newIdeaRef = ideaRef.push();
+
+        Idea newIdea = new Idea(ref.getAuth().getUid(), desc, HashtagManager.getHashTagsMap(desc));
+        newIdeaRef.setValue(newIdea);
+
+=======
     public static List<String> getHashTags(String msg) {
         List<String> hashTags = new ArrayList<>();
         int hashIndex = msg.indexOf("#");
@@ -54,6 +70,7 @@ public class NewIdeaController {
 
         }
         return hashTags;
+>>>>>>> origin/master
     }
 
 }

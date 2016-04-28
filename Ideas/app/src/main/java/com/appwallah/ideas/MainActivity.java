@@ -43,7 +43,18 @@ import java.util.TimeZone;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
+<<<<<<< HEAD
+    private AuthManager mAuthManager;
+    private AuthManagerListener mAuthListener = new AuthManagerListener() {
+        @Override
+        public void onAuthSuccess() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    loadIdeas();
+=======
 public class MainActivity extends AppCompatActivity {
+>>>>>>> origin/master
 
     private static final String TAG = MainActivity.class.getName();
 
@@ -57,10 +68,14 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+<<<<<<< HEAD
+        setContentView(R.layout.activity_main);
+=======
         mRecycler = (RecyclerView) findViewById(R.id.ideas_recycler);
         mRecycler.setHasFixedSize(true);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
 
+>>>>>>> origin/master
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -72,6 +87,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+<<<<<<< HEAD
+        initializeRecycler();
+
+        mAuthManager = new AuthManager(this, mAuthListener);
+        mAuthManager.authenticateUser();
+
+
+=======
         if (mayGetAccounts()) {
             initialize();
         }
@@ -112,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
         GoogleAccountCredential credential =
                 GoogleAccountCredential.usingAudience(this, ClientCredentials.AUDIENCE);
         startActivityForResult(credential.newChooseAccountIntent(), Constants.REQUEST_ACCOUNT_PICKER);
+>>>>>>> origin/master
     }
 
 
@@ -163,16 +187,29 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+<<<<<<< HEAD
+    public void loadIdeas() {
+        Firebase ideaRef = mFirebaseRef.child("ideas");
+        //Query queryRef = ideaRef.orderByChild("user_id").equalTo(mFirebaseRef.getAuth().getUid()).equalTo(true,"nbaidea");
+=======
     @Override
     protected void onDestroy() {
         super.onDestroy();
         //mAdapter.cleanup();
     }
+>>>>>>> origin/master
 
     class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, List<IdeaProtoDescriptionCreatedHashtags>> {
         private Ideasapi apiService = null;
         private Context context;
 
+<<<<<<< HEAD
+        mAdapter = new FirebaseRecyclerAdapter<Idea, IdeaViewHolder>(
+                Idea.class, R.layout.idea_item, IdeaViewHolder.class, ideaRef) {
+            @Override
+            public void populateViewHolder(IdeaViewHolder ideaViewHolder, Idea idea, int position) {
+                ideaViewHolder.ideaText.setText(idea.getDesc());
+=======
         @Override
         protected List<IdeaProtoDescriptionCreatedHashtags> doInBackground(Pair<Context, String>... params) {
             context = params[0].first;
@@ -187,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
                 return null;
+>>>>>>> origin/master
             }
         }
 

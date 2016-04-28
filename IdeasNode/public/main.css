@@ -1,0 +1,16 @@
+body {
+  font-family:'Lucida Console', Monaco, monospace;
+  text-align: center;
+}
+
+#title {
+  margin: auto;
+  font-size: 30px;
+  padding: 10px;
+}
+
+#subtitle {
+  margin: auto; 
+  font-size: 14px; 
+  padding: 10px
+}

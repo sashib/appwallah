@@ -2,10 +2,10 @@ var mongoose = require('mongoose');
 var HashTagParser = require('../utils/hashTagParser');
 
 //dev
-mongoose.connect('mongodb://localhost/ideas');
+//mongoose.connect('mongodb://localhost/ideas');
 
 //prod
-//mongoose.connect('mongodb://sashi:ideasd3v@ds017231.mlab.com:17231/ideas')
+mongoose.connect('mongodb://db:ideasd3v@ds021691.mlab.com:21691/ideasdb')
 
 var Idea = require('../models/idea');
 
@@ -42,18 +42,10 @@ exports.addIdea = function(req, res) {
 
   console.log(str);
 
-  // find all #tags in idea
-  var re = /\#.*?(?=\s|$)/ig;
-  while ((match = re.exec(str)) != null){
-  	var hashtag = match[0];
-  	hashtags.push(hashtag);
-    console.log(hashtag);
-  }
-
   var hashTagParser = new HashTagParser();
   var idea = new Idea();
   idea.description = str;
-  idea.hashtags = hashTagParser.getHashTags(str);//hashtags;
+  idea.hashtags = hashTagParser.getHashTags(str);
 
   idea.save(function(err) {
     if(err)

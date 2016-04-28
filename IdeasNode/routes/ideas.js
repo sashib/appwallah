@@ -2,10 +2,10 @@ var mongoose = require('mongoose');
 var HashTagParser = require('../utils/hashTagParser');
 
 //dev
-mongoose.connect('mongodb://localhost/ideas');
+//mongoose.connect('mongodb://localhost/ideas');
 
 //prod
-//mongoose.connect('mongodb://sashi:ideasd3v@ds017231.mlab.com:17231/ideas')
+mongoose.connect('mongodb://db:ideasd3v@ds021691.mlab.com:21691/ideasdb')
 
 var Idea = require('../models/idea');
 

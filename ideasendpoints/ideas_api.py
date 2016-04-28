@@ -15,7 +15,6 @@ ANDROID_AUDIENCE = WEB_CLIENT_ID
 class Idea(EndpointsModel):
   description = ndb.StringProperty(required=True)
   created = ndb.DateTimeProperty(auto_now_add=True)
-  date = ndb.DateProperty(auto_now_add=True)
   owner = ndb.UserProperty()
   hashtags = ndb.StringProperty(repeated=True)
 
@@ -35,8 +34,8 @@ class IdeasApi(remote.Service):
     idea.put()
     return idea
 
-  @Idea.query_method(query_fields=('hashtags', 'date', 'order', 'limit', 'pageToken'),
-                     collection_fields=('description', 'date', 'hashtags'),
+  @Idea.query_method(query_fields=('hashtags', 'created', 'order', 'limit', 'pageToken'),
+                     collection_fields=('description', 'created', 'hashtags'),
                      user_required=True,
                      path='ideas', name='idea.list')
   def IdeaList(self, query):

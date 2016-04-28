@@ -34,6 +34,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.2.0'
 
     compile([group: 'com.appspot.ideas_staging', name: 'ideasapi', version: 'v1-1.21.0-SNAPSHOT'])
+
     compile 'com.google.android.gms:play-services-auth:8.4.0'
     compile 'com.google.api-client:google-api-client-android:1.21.0'
     compile 'com.google.http-client:google-http-client-gson:1.21.0'

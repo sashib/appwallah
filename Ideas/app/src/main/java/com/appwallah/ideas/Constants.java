@@ -14,4 +14,6 @@ public class Constants {
     public static final int REQUEST_READ_CONTACTS = 0;
     public static final int REQUEST_ACCOUNT_PICKER = 2;
 
+    public static final long QUERY_LIMIT = 100;
+
 }

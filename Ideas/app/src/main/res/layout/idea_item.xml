@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_height="match_parent"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
     >
 
@@ -11,14 +11,35 @@
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        card_view:contentPadding="10dp">
+        android:padding="10dp">
 
-        <TextView
-            android:id="@+id/idea_text"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textSize="20sp"
-            android:textColor="@android:color/black"/>
+            android:layout_height="wrap_content"
+            android:background="@color/background"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/date_text"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:textSize="18sp"
+                android:lines="2"
+                android:layout_gravity="top"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:background="@color/light_gray"/>
+            <TextView
+                android:id="@+id/idea_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:padding="10dp"
+                android:textSize="20sp"
+                android:layout_weight="1"
+                android:minLines="2"
+                android:textColor="@android:color/black"/>
+
+        </LinearLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>

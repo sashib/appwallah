@@ -23,7 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.appspot.ideas_staging.ideasapi.Ideasapi;
-import com.appspot.ideas_staging.ideasapi.model.IdeaProtoDescriptionDateHashtags;
+import com.appspot.ideas_staging.ideasapi.model.IdeaProtoDescriptionCreatedHashtags;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -33,9 +33,13 @@ import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.api.client.json.gson.GsonFactory;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.TimeZone;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -52,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        mRecycler = (RecyclerView) findViewById(R.id.ideas_recycler);
+        mRecycler.setHasFixedSize(true);
+        mRecycler.setLayoutManager(new LinearLayoutManager(this));
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -107,7 +116,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void loadIdeas() {
-        new EndpointsAsyncTask().execute(new Pair<Context, String>(this, "2016-04-20"));
+        Date today = Calendar.getInstance().getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sdf.setTimeZone(TimeZone.getDefault());
+
+        new EndpointsAsyncTask().execute(new Pair<Context, String>(this, sdf.format(today)));
     }
 
 
@@ -138,12 +151,16 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, Constants.REQUEST_NEW_IDEA);
     }
 
-    public void initializeRecycler(List<IdeaProtoDescriptionDateHashtags> ideas) {
-        mRecycler = (RecyclerView) findViewById(R.id.ideas_recycler);
-        mRecycler.setHasFixedSize(true);
-        mRecycler.setLayoutManager(new LinearLayoutManager(this));
+    public void initializeRecycler(List<IdeaProtoDescriptionCreatedHashtags> ideas) {
+        if (mAdapter == null) {
+            mAdapter = new IdeasRecyclerAdapter(ideas);
+            mRecycler.setAdapter(mAdapter);
 
-        mAdapter = new IdeasRecyclerAdapter(ideas);
+        } else {
+            mAdapter.addItemsToList(ideas);
+            mAdapter.notifyDataSetChanged();
+        }
+
     }
 
     @Override
@@ -152,18 +169,21 @@ public class MainActivity extends AppCompatActivity {
         //mAdapter.cleanup();
     }
 
-    class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, List<IdeaProtoDescriptionDateHashtags>> {
+    class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, List<IdeaProtoDescriptionCreatedHashtags>> {
         private Ideasapi apiService = null;
         private Context context;
 
         @Override
-        protected List<IdeaProtoDescriptionDateHashtags> doInBackground(Pair<Context, String>... params) {
+        protected List<IdeaProtoDescriptionCreatedHashtags> doInBackground(Pair<Context, String>... params) {
             context = params[0].first;
             String date = params[0].second;
 
             apiService = IdeasApiService.getApiService(context);
             try {
-                return apiService.idea().list().setDate(date).execute().getItems();
+                return apiService.idea().list()
+                        .setOrder("-created")
+                        .setLimit(Constants.QUERY_LIMIT)
+                        .execute().getItems();
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
                 return null;
@@ -171,9 +191,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(List<IdeaProtoDescriptionDateHashtags> ideas) {
-            if (ideas != null)
+        protected void onPostExecute(List<IdeaProtoDescriptionCreatedHashtags> ideas) {
+            if (ideas != null) {
                 initializeRecycler(ideas);
+            }
+
         }
     }
 

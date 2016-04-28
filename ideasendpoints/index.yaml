@@ -15,3 +15,16 @@ indexes:
   - name: date
   - name: owner
   - name: created
+
+- kind: Idea
+  properties:
+  - name: date
+  - name: owner
+  - name: created
+    direction: desc
+
+- kind: Idea
+  properties:
+  - name: owner
+  - name: created
+    direction: desc

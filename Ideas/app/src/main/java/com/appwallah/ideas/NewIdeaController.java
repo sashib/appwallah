@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.appspot.ideas_staging.ideasapi.Ideasapi;
 import com.appspot.ideas_staging.ideasapi.model.Idea;
-import com.appspot.ideas_staging.ideasapi.model.IdeaProtoDescriptionDateHashtags;
+import com.appspot.ideas_staging.ideasapi.model.IdeaProtoDescriptionCreatedHashtags;
 
 import java.io.IOException;
 import java.util.ArrayList;

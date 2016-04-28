@@ -5,18 +5,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.appspot.ideas_staging.ideasapi.model.IdeaProtoDescriptionDateHashtags;
+import com.appspot.ideas_staging.ideasapi.model.IdeaProtoDescriptionCreatedHashtags;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class IdeasRecyclerAdapter extends RecyclerView.Adapter<IdeaViewHolder> {
-    private List<IdeaProtoDescriptionDateHashtags> mDataset;
+    private List<IdeaProtoDescriptionCreatedHashtags> mDataset;
 
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public IdeasRecyclerAdapter(List<IdeaProtoDescriptionDateHashtags> ideaList) {
+    public IdeasRecyclerAdapter(List<IdeaProtoDescriptionCreatedHashtags> ideaList) {
         mDataset = ideaList;
+    }
+
+    public void addItemsToList(List<IdeaProtoDescriptionCreatedHashtags> items) {
+        mDataset.clear();
+        //mDataset.addAll(items);
+        notifyDataSetChanged();
     }
 
     // Create new views (invoked by the layout manager)
@@ -36,7 +44,19 @@ public class IdeasRecyclerAdapter extends RecyclerView.Adapter<IdeaViewHolder> {
     public void onBindViewHolder(IdeaViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.ideaText.setText(mDataset.get(position).getDescription());
+        IdeaProtoDescriptionCreatedHashtags item = mDataset.get(position);
+
+        holder.ideaText.setText(item.getDescription());
+
+        String itemDate = item.getCreated();
+
+        String dt = DateManager.getDayString(itemDate,
+                DateManager.DATE_FORMAT, DateManager.MONTH_DAY_FORMAT);
+
+        holder.dateText.setText(dt);
+
+        int resId = DateManager.isDateToday(itemDate) ? R.color.teal : R.color.light_gray;
+        holder.dateText.setBackgroundResource(resId);
 
     }
 

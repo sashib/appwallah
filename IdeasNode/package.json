@@ -1,0 +1,11 @@
+{
+    "name": "ideas",
+    "description": "Ideas API",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "express": "~4.0.0",
+        "mongoose": "~4.4.13",
+        "body-parser": "~1.15.0"
+    }
+}

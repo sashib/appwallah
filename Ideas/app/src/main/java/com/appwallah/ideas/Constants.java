@@ -5,7 +5,15 @@ package com.appwallah.ideas;
  */
 public class Constants {
     public static final String PREFS_NAME = "ideas_preferences";
+    public static final String PREF_ACCOUNT_NAME = "accountName";
     public static final int MODE_PRIVATE = 0;
     public static final String TOKEN = "token";
     public static final int EXPIRES_DAYS = 1;
+
+    public static final int REQUEST_NEW_IDEA = 1;
+    public static final int REQUEST_READ_CONTACTS = 0;
+    public static final int REQUEST_ACCOUNT_PICKER = 2;
+
+    public static final long QUERY_LIMIT = 100;
+
 }

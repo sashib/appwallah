@@ -32,7 +32,7 @@ public class NewIdeaController {
         Firebase ideaRef = ref.child("ideas");
         Firebase newIdeaRef = ideaRef.push();
 
-        Idea newIdea = new Idea(ref.getAuth().getUid(), desc);
+        Idea newIdea = new Idea(ref.getAuth().getUid(), desc, HashtagManager.getHashTagsMap(desc));
         newIdeaRef.setValue(newIdea);
 
     }

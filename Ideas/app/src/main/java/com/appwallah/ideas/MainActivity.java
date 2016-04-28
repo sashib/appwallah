@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    //loadIdeas();
+                    loadIdeas();
 
                 }
             });
@@ -61,9 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
         mFirebaseRef = new Firebase(FireBaseConstants.FIREBASE_URL);
 
-        mAuthManager = new AuthManager(this, mAuthListener);
-        mAuthManager.authenticateUser();
-
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -79,6 +76,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         initializeRecycler();
+
+        mAuthManager = new AuthManager(this, mAuthListener);
+        mAuthManager.authenticateUser();
+
+
     }
 
     @Override
@@ -122,11 +124,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadIdeas() {
         Firebase ideaRef = mFirebaseRef.child("ideas");
-        Query queryRef = ideaRef.orderByChild("user_id").equalTo(mFirebaseRef.getAuth().getUid());
+        //Query queryRef = ideaRef.orderByChild("user_id").equalTo(mFirebaseRef.getAuth().getUid()).equalTo(true,"nbaidea");
 
 
         mAdapter = new FirebaseRecyclerAdapter<Idea, IdeaViewHolder>(
-                Idea.class, R.layout.idea_item, IdeaViewHolder.class, queryRef) {
+                Idea.class, R.layout.idea_item, IdeaViewHolder.class, ideaRef) {
             @Override
             public void populateViewHolder(IdeaViewHolder ideaViewHolder, Idea idea, int position) {
                 ideaViewHolder.ideaText.setText(idea.getDesc());

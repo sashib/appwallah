@@ -15,15 +15,17 @@ public class Idea {
     String userId;
     String desc;
     long timestamp;
+    Map<String, Boolean> tags;
 
     public Idea() {
         init();
     }
 
-    public Idea(String userId, String description) {
+    public Idea(String userId, String description, Map<String, Boolean> hashTags) {
         init();
         this.userId = userId;
         this.desc = description;
+        this.tags = hashTags;
     }
 
     public void init() {
@@ -55,5 +57,15 @@ public class Idea {
     public void setUserId(String uid) {
         this.userId = uid;
     }
+
+    public Map<String, Boolean> getTags() {
+        return tags;
+    }
+
+    public void setTags(Map<String, Boolean> tags) {
+        this.tags = tags;
+    }
+
+
 
 }

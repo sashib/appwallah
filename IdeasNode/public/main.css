@@ -1,16 +1,22 @@
 body {
-  font-family:'Lucida Console', Monaco, monospace;
+  font-family:'Calibri';
   text-align: center;
 }
 
 #title {
+  font-family: 'Roboto', sans-serif;
   margin: auto;
-  font-size: 30px;
+  font-size: 40px;
   padding: 10px;
 }
 
 #subtitle {
   margin: auto; 
-  font-size: 14px; 
+  font-size: 16px;
+  color: #444444; 
   padding: 10px
+}
+
+#ideas-main {
+	margin-top: 100px;
 }

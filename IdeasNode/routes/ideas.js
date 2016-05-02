@@ -12,6 +12,37 @@ var Idea = require('../models/idea');
 var IDEA_QUERY_LIMIT = 5;
 var IDEA_QUERY_SORT_ORDER = {created: -1};
 
+exports.addIdea = function(str, callback) {
+  var hashtags = [];
+
+  console.log('New idea: ' + str);
+
+  var hashTagParser = new HashTagParser();
+  var idea = new Idea();
+  idea.description = str;
+  idea.hashtags = hashTagParser.getHashTags(str);
+
+  idea.save(callback)  
+};
+
+exports.find = function(hashTag, callback) {
+  if (hashTag != null) {
+    Idea.find({$text: {$search: hashTag}})
+    .limit(IDEA_QUERY_LIMIT)
+    .sort(IDEA_QUERY_SORT_ORDER)
+    .exec(callback);
+  } else {
+  Idea.find()
+  .limit(IDEA_QUERY_LIMIT)
+  .sort(IDEA_QUERY_SORT_ORDER)
+  .exec(callback);
+
+  }
+
+};
+
+
+/*
 exports.findAll = function(req, res) {
   var callback = function (err, ideas) {
       if (err) 
@@ -54,3 +85,4 @@ exports.addIdea = function(req, res) {
   })
   
 };
+*/

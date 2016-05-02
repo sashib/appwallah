@@ -23,12 +23,14 @@ app.use(function(req, res, next) {
   }
 });
 
+/*
 var router = express.Router();
 router.route('/ideas')
       .post(ideas.addIdea)
       .get(ideas.findAll);
 
 app.use('/api', router);
+*/
 
 app.get('/webhook/', facebook.handleWebhookGet);
 app.post('/webhook/', facebook.handleWebhookPost);

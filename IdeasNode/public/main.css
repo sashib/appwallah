@@ -1,22 +1,55 @@
 body {
-  font-family:'Calibri';
+  font-family: 'Roboto', sans-serif;
   text-align: center;
 }
 
 #title {
-  font-family: 'Roboto', sans-serif;
   margin: auto;
-  font-size: 40px;
+  font-size: 30pt;
   padding: 10px;
 }
 
 #subtitle {
   margin: auto; 
-  font-size: 16px;
+  font-size: 12pt;
   color: #444444; 
   padding: 10px
 }
 
 #ideas-main {
-	margin-top: 100px;
+	margin-top: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 500px;
+  border-top: solid 2px #dcdcdc;
+  padding-top: 40px;
+}
+
+#ideas-logo {
+  background-image: url("ideawallah-color-logo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100px 100px;
+  width: 125px;
+  height: 125px;
+  float: left;
+}
+
+#ideas-content {
+  width:330px;
+  float:right;
+  text-align: left;  
+}
+
+.apptitle {
+  color:#000000;
+  line-height: 2.5em;
+  font-weight: bold;
+
+}
+
+.content {
+  font-size: 10pt;
+  color:#444444;
+  line-height: 1.75em;
 }

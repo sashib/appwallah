@@ -49,7 +49,6 @@ body {
 
 .apptitle {
   color:#000000;
-  line-height: 2.5em;
   font-weight: bold;
 
 }
@@ -57,5 +56,6 @@ body {
 .content {
   font-size: 10pt;
   color:#444444;
+  margin-top: 10px;
   line-height: 1.75em;
 }

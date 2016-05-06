@@ -10,7 +10,12 @@ var should = chai.should();
 
 chai.use(chaiHttp);
 
-
+describe('Server', function() {   
+  describe('/webhook/', function() {
+    it('should return 200 and call processMessage for POST');
+  });
+});
+/*
 describe('Server', function() {	  
   describe('api/ideas', function() {
     it('should return a 401 if no sender is passed to /ideas GET', function(done) {
@@ -88,3 +93,4 @@ describe('Server', function() {
 
   });
 });
+*/

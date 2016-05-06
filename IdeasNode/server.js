@@ -1,6 +1,5 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
-    development = require('./routes/development'),
     facebook = require('./routes/facebook');
 
 var app = express();
@@ -26,14 +25,6 @@ app.use(function(req, res, next) {
 
 console.log("NODE_ENV is: " + process.env.NODE_ENV);
 
-if (process.env.NODE_ENV != 'production') {
-  var router = express.Router();
-  router.route('/ideas')
-      .post(development.addIdea)
-      .get(development.findAll);
-
-  app.use('/api', router);
-}
 app.get('/webhook/', facebook.handleWebhookGet);
 app.post('/webhook/', facebook.handleWebhookPost);
 

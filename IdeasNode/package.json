@@ -3,7 +3,7 @@
   "description": "Ideas API",
   "version": "0.0.1",
   "scripts": {
-      "start": "node server"
+    "start": "node server"
   },
   "private": true,
   "dependencies": {
@@ -11,5 +11,10 @@
     "mongoose": "~4.4.13",
     "body-parser": "~1.15.0",
     "request": "~2.72.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^2.0.1",
+    "sinon": "^1.17.4"
   }
 }

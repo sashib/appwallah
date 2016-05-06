@@ -1,3 +1,6 @@
+var ideas = require('../routes/ideas'),
+    messages = require('./messages');
+
 
 var isNewIdea = function(str) {
   return (!isFindByHashTag(str) && !isHelp(str));
@@ -21,15 +24,6 @@ var getFindHashTag = function(str) {
   	hashTag = hashTags[1];
   }
   return hashTag;
-
-  /*
-  while ((match = re.exec(str)) != null){
-  	var hashtag = match[0];
-  	console.log(hashtag);
-  	hashTags.push(hashtag);
-  }	
-  return hashTags[0];	
-  */
 }
 
 var isHelp = function(str) {
@@ -40,9 +34,51 @@ var isHelp = function(str) {
   	return false;
 };
 
+
+var handleNewIdea = function(sender, senderSource, text, cb) {
+  var callback = function(err) {
+    if(err) {
+      console.log('error saving idea: ' + err);
+      cb(sender, messages.ERROR_ADDING_IDEA);
+    } else {
+      console.log('saved new idea, will send success msg ' + messages.ADDED_IDEA);
+      cb(sender, messages.ADDED_IDEA);
+    }
+  }
+  ideas.addIdea(sender, senderSource, text, callback);
+}
+
+var handleFind = function(sender, senderSource, text, cb) {
+  var callback = function (err, ideas) {
+    var ideasStr = "";
+      if (!err) {
+        if (ideas.length <= 0) {
+          ideasStr = messages.EMPTY_FIND_RESULTS;
+        } else {
+          for (i=0; i < ideas.length; i++) {
+            ideasStr += ideas[i].description + '\n\n';
+          }
+        }
+      }
+      cb(sender, ideasStr);
+  };
+  ideas.find(sender, senderSource, getFindHashTag(text), callback);   
+
+}
+
+var handleMessageReply = function(sender, text) {
+  if(messageParser.isNewIdea(text)) {
+    handleNewIdea(sender, text);
+  } else if (messageParser.isFindByHashTag(text)) {
+    handleFind(sender, text);
+  }
+}
+
 module.exports = {
   isNewIdea: isNewIdea,
   isFindByHashTag: isFindByHashTag,
   getFindHashTag: getFindHashTag,
-  isHelp: isHelp
+  isHelp: isHelp,
+  handleNewIdea: handleNewIdea,
+  handleFind: handleFind
 }

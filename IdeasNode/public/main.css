@@ -16,27 +16,33 @@ body {
   padding: 10px
 }
 
+#divider {
+  width:450px;
+  margin: auto;
+  margin-top: 30px;
+  padding-top: 40px;
+  border-top: solid 2px #dcdcdc;
+}
+
 #ideas-main {
-	margin-top: 50px;
+	margin-top: 20px;
   margin-left: auto;
   margin-right: auto;
-  width: 500px;
-  border-top: solid 2px #dcdcdc;
-  padding-top: 40px;
+  width: 425px;
 }
 
 #ideas-logo {
-  background-image: url("ideawallah-color-logo.png");
+  background-image: url("ideawallah.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100px 100px;
-  width: 125px;
-  height: 125px;
+  width: 100px;
+  height: 100px;
   float: left;
 }
 
 #ideas-content {
-  width:330px;
+  width:300px;
   float:right;
   text-align: left;  
 }

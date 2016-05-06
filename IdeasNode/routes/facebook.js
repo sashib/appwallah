@@ -1,17 +1,19 @@
-
 var request = require('request'),
-	messageParser = require('../utils/messageParser'),
-    ideas = require('../routes/ideas');
+	  messageParser = require('../utils/messageParser');
 
-var token = "EAADXCiPJb3MBAO3vDGcguiMv9nzOfq71yrpl3L4PQ7bhXNuaZAioYZBx3d8JIOwOIfyNlqctts5hkqPWsqinMw6jwi4MCHlHkH6QidIYZBeLWR5qY8lGwwYsnXSiSw0BDjiaEbkoWZBwvFj2VM9IWxyl7fJHmyo0OwSK5nn9ygZDZD";
+// Facebook Page Token for App
+var TOKEN = "EAADXCiPJb3MBAO3vDGcguiMv9nzOfq71yrpl3L4PQ7bhXNuaZAioYZBx3d8JIOwOIfyNlqctts5hkqPWsqinMw6jwi4MCHlHkH6QidIYZBeLWR5qY8lGwwYsnXSiSw0BDjiaEbkoWZBwvFj2VM9IWxyl7fJHmyo0OwSK5nn9ygZDZD";
+// Source of userIds
+var USER_SOURCE = "facebook";
 
-function sendTextMessage(sender, text) {
+
+var sendTextMessage = function(sender, text) {
   messageData = {
     text:text
   }
   request({
     url: 'https://graph.facebook.com/v2.6/me/messages',
-    qs: {access_token:token},
+    qs: {access_token:TOKEN},
     method: 'POST',
     json: {
       recipient: {id:sender},
@@ -26,41 +28,39 @@ function sendTextMessage(sender, text) {
   });
 }
 
-function handleNewIdea(sender, text) {
-  var callback = function(err) {
-    if(err) {
-      console.log('error saving idea: ' + err);
-      sendTextMessage(sender, "Had trouble adding that idea");
-    } else {
-      sendTextMessage(sender, "Idea added!");
-    }
-  }
-  ideas.addIdea(text, callback);
-}
 
-function handleFind(sender, text) {
-  var callback = function (err, ideas) {
-    var ideasStr = "";
-      if (!err) {
-        for (i=0; i < ideas.length; i++) {
-          ideasStr += ideas[i].description + '\n\n';
+/*
+Sample Callback POST
+
+{
+  "object":"page",
+  "entry":[
+    {
+      "id":"PAGE_ID",
+      "time":1460245674269,
+      "messaging":[
+        {
+          "sender":{
+            "id":"USER_ID"
+          },
+          "recipient":{
+            "id":"PAGE_ID"
+          },
+          "timestamp":1460245672080,
+          "message":{
+            "mid":"mid.1460245671959:dad2ec9421b03d6f78",
+            "seq":216,
+            "text":"hello"
+          }
         }
-      }
-      sendTextMessage(sender, ideasStr);
-  };
-  ideas.find(messageParser.getFindHashTag(text), callback);   
-
+      ]
+    }
+  ]
 }
 
-function handleMessageReply(sender, text) {
-  if(messageParser.isNewIdea(text)) {
-  	handleNewIdea(sender, text);
-  } else if (messageParser.isFindByHashTag(text)) {
-    handleFind(sender, text);
-  }
-}
-
-function processMessage(req, res) {
+*/
+var processMessage = function(req, res) {
+  //looking at only the first entry
   messaging_events = req.body.entry[0].messaging;
   for (i = 0; i < messaging_events.length; i++) {
     event = req.body.entry[0].messaging[i];
@@ -69,13 +69,13 @@ function processMessage(req, res) {
       text = event.message.text;
       // Handle a text message from this sender
       console.log('text sent from messennger is: ' + text);
-      handleMessageReply(sender, text);
-      //sendTextMessage(sender, "Text received, echo: "+ text.substring(0, 200));
+      //handleMessageReply(sender, text);
+      messageParser.handleMessageReply(sender, text, sendTextMessage);
     }
   }
 }
 
-exports.handleWebhookGet = function (req, res) {
+var handleWebhookGet = function (req, res) {
   console.log('Inside handleWebHookGet');
   if (req.query['hub.verify_token'] === '<validation_token>') {
     res.send(req.query['hub.challenge']);
@@ -83,9 +83,16 @@ exports.handleWebhookGet = function (req, res) {
   res.send('Error, wrong validation token');
 }
 
-exports.handleWebhookPost = function (req, res) {
+var handleWebhookPost = function (req, res) {
   console.log('Inside handleWebHook');
   console.log('req is: ' + req.body);
   processMessage(req, res);
   res.status(200).send('Success');
+}
+
+module.exports = {
+  handleWebhookPost: handleWebhookPost,
+  handleWebhookGet: handleWebhookGet,
+  processMessage: processMessage,
+  sendTextMessage: sendTextMessage
 }

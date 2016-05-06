@@ -7,23 +7,16 @@ var should = require('chai').should(),
 
 
 describe('ideas', function() {
-  before(testData.createIdeaCollection);
-
-  after(function(done){
-    Idea.collection.drop();
-    done();
-  });
-  
   describe('find()', function() {
     it('should return a list of results matching \'awesome\'', function(done) {
       var text = 'awesome';
       var sender = 'testuser';
       var senderSource = 'development';
-      ideas.find(sender, senderSource, text, function(err, ideas) {
-        console.log('find callback, ideas length is: ' + ideas.length);
+      var cb = function(err, ideas) {
         ideas.should.have.lengthOf(3);
         done();
-      })
+      };
+      ideas.find(sender, senderSource, text, cb);
     });
   });
 

@@ -3,7 +3,7 @@ process.env.NODE_ENV = 'test';
 var expect = require('chai').expect;
 var HashTagParser = require('../utils/hashTagParser');
 
-describe('HashTagParser', function() {
+describe('hashTagParser', function() {
   describe('getHashTags()', function () {
     var hashTagParser = new HashTagParser();
     it('should return [\'#idea\'] when the value is \'my new #idea\'', function () {

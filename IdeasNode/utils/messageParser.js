@@ -38,10 +38,8 @@ var isHelp = function(str) {
 var handleNewIdea = function(sender, senderSource, text, cb) {
   var callback = function(err) {
     if(err) {
-      console.log('error saving idea: ' + err);
       cb(sender, messages.ERROR_ADDING_IDEA);
     } else {
-      console.log('saved new idea, will send success msg ' + messages.ADDED_IDEA);
       cb(sender, messages.ADDED_IDEA);
     }
   }
@@ -51,16 +49,16 @@ var handleNewIdea = function(sender, senderSource, text, cb) {
 var handleFind = function(sender, senderSource, text, cb) {
   var callback = function (err, ideas) {
     var ideasStr = "";
-      if (!err) {
-        if (ideas.length <= 0) {
-          ideasStr = messages.EMPTY_FIND_RESULTS;
-        } else {
-          for (i=0; i < ideas.length; i++) {
-            ideasStr += ideas[i].description + '\n\n';
-          }
+    if (!err) {
+      if (ideas.length <= 0) {
+        ideasStr = messages.EMPTY_FIND_RESULTS;
+      } else {
+        for (i=0; i < ideas.length; i++) {
+           ideasStr += ideas[i].description + '\n\n';
         }
       }
-      cb(sender, ideasStr);
+    }
+    cb(sender, ideasStr);
   };
   ideas.find(sender, senderSource, getFindHashTag(text), callback);   
 

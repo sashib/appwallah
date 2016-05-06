@@ -51,9 +51,9 @@ exports.createIdeaCollection = function(done) {
 
 						 }
 					  ];
-
+  
   Idea.create(ideaCollection, function(err, ideas) {
   	console.log('created a collection of items: ' + ideas.length);
-  	done();
+  	done();  	
   });  
 }

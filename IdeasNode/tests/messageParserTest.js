@@ -6,7 +6,7 @@ var expect = require('chai').expect,
     Idea = require('../models/idea'),
     testData = require('./testData');
 
-describe('MessageParser', function() {
+describe('messageParser', function() {
   describe('isNewIdea()', function () {
     it('should return true when the value is \'my new #idea\'', function () {
       var testStr = 'my new #idea';
@@ -66,20 +66,14 @@ describe('MessageParser', function() {
   });
   
   describe('handleFind()', function() {
-    before(testData.createIdeaCollection);
 
-    after(function(done){
-      Idea.collection.drop();
-      done();
-    });
     it('should return a list of results matching \'awesome\' if text is \'find awesome\'', function(done) {
       var text = 'find awesome';
-      var sender = 'testuser';
-      var senderSource = 'development';
-      var expected = 'a sixth #beautiful #grand new #awesome #idea\n\na third #grand new #awesome #idea\n\na fourth new #awesome #idea\n\n';
-      messageParser.handleFind(sender, senderSource, text, function(sender, text) {
-        console.log('handleFind callback, text is: ' + text);
-        expect(text).to.equal(expected);
+      var userId = 'testuser';
+      var userSource = 'development';
+      var expected = 'a sixth #beautiful #grand new #awesome #idea';//\n\na third #grand new #awesome #idea\n\na fourth new #awesome #idea\n\n';
+      messageParser.handleFind(userId, userSource, text, function(sender, text) {
+        expect(text).to.contain(expected);
         done();
       })
     });
@@ -90,7 +84,6 @@ describe('MessageParser', function() {
       var text = 'some new #idea test';
       var sender = 'testsender';
       messageParser.handleNewIdea(sender, 'development', text, function(sender, text) {
-        console.log('handleNewIdea callback, text is: ' + text);
         expect(text).to.equal(messages.ADDED_IDEA);
         done();
       })

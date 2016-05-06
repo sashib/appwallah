@@ -11,14 +11,7 @@ var should = chai.should();
 chai.use(chaiHttp);
 
 
-describe('Server', function() {	
-  before(testData.createIdeaCollection);
-
-  after(function(done){
-    Idea.collection.drop();
-    done();
-  });
-
+describe('Server', function() {	  
   describe('api/ideas', function() {
     it('should return a 401 if no sender is passed to /ideas GET', function(done) {
   	  chai.request(server)

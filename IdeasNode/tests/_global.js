@@ -1,5 +1,5 @@
 var testData = require('./testData'),
-    Idea = require('../models/idea');
+    Idea = require('../app/models/idea');
 
 before(testData.createIdeaCollection);
 

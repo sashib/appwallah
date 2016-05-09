@@ -1,7 +1,6 @@
 
-function HashTagParser() {}
 
-HashTagParser.prototype.getHashTags = function(str) {
+module.exports.getHashTags = function(str) {
   var hashTags = [];
   //var re = /\#.*?(?=\s|$)/ig;
   var re = /#\w+\b/ig;
@@ -11,5 +10,3 @@ HashTagParser.prototype.getHashTags = function(str) {
   }	
   return hashTags;
 };
-
-module.exports = HashTagParser;

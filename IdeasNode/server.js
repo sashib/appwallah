@@ -1,6 +1,6 @@
 var express = require('express'),
-    bodyParser = require('body-parser'),
-    facebook = require('./routes/facebook');
+    bodyParser = require('body-parser')
+    facebookController = require('./app/controllers/facebookController');
 
 var app = express();
 
@@ -25,8 +25,8 @@ app.use(function(req, res, next) {
 
 console.log("NODE_ENV is: " + process.env.NODE_ENV);
 
-app.get('/webhook/', facebook.handleWebhookGet);
-app.post('/webhook/', facebook.handleWebhookPost);
+app.get('/webhook/', facebookController.handleWebhookGet);
+app.post('/webhook/', facebookController.handleWebhookPost);
 
 app.use(express.static('public'));
 app.get('/', function (req, res) {
@@ -38,5 +38,6 @@ app.listen(app.get('port'));
 
 console.log('Node ready to rock. Listening on port ' + app.get('port'));
 
-module.exports = app;
+module.exports = {facebookController: facebookController,
+  app: app};
 

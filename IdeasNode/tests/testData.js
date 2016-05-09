@@ -1,6 +1,6 @@
-var Idea = require('../models/idea');
+var Idea = require('../app/models/idea');
 
-exports.createIdeaCollection = function(done) { 
+module.exports.createIdeaCollection = function(done) { 
   var ideaCollection = [
 					     {
 						   description: 'a first idea #idea',

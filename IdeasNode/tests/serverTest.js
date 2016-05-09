@@ -2,9 +2,10 @@ process.env.NODE_ENV = 'test';
 
 var chai = require('chai'),
     chaiHttp = require('chai-http'),
+    sinon = require('sinon'),
     server = require('../server'),
-    Idea = require('../models/idea'),
-    testData = require('./testData');
+    facebookController = require('../app/controllers/facebookController'),
+    Idea = require('../app/models/idea');
 
 var should = chai.should();
 

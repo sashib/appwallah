@@ -30,6 +30,7 @@ describe('facebook', function() {
       resStatusStub.calledWith(200).should.be.ok;
       resStatusSendStub.calledWith('Success').should.be.ok;
       
+      stub.restore();
       done();      
     });
   });

@@ -34,10 +34,12 @@ app.get('/', function (req, res) {
 });
 
 app.set('port', process.env.PORT || 3000);
-app.listen(app.get('port'));
+
+if (process.env.NODE_ENV != 'test') {
+  app.listen(app.get('port'));
+}
 
 console.log('Node ready to rock. Listening on port ' + app.get('port'));
 
-module.exports = {facebookController: facebookController,
-  app: app};
+module.exports = app;
 

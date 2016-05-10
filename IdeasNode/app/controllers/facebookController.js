@@ -1,5 +1,5 @@
 var request = require('request'),
-	  messageHelper = require('../helpers/messageHelper');
+	  messageController = require('./messageController');
 
  // Facebook Page Token for App
 var TOKEN = "EAADXCiPJb3MBAO3vDGcguiMv9nzOfq71yrpl3L4PQ7bhXNuaZAioYZBx3d8JIOwOIfyNlqctts5hkqPWsqinMw6jwi4MCHlHkH6QidIYZBeLWR5qY8lGwwYsnXSiSw0BDjiaEbkoWZBwvFj2VM9IWxyl7fJHmyo0OwSK5nn9ygZDZD";
@@ -28,18 +28,19 @@ module.exports.sendTextMessage = function(sender, text) {
   });
 }
 
-module.exports.processMessage = function(req, res) {
+module.exports.processMessage = function(reqBody) {
   //looking at only the first entry
-  messaging_events = req.body.entry[0].messaging;
+  console.log('in process message: ');
+  messaging_events = reqBody.entry[0].messaging;
   for (i = 0; i < messaging_events.length; i++) {
-    event = req.body.entry[0].messaging[i];
+    event = reqBody.entry[0].messaging[i];
     sender = event.sender.id;
     if (event.message && event.message.text) {
       text = event.message.text;
       // Handle a text message from this sender
       console.log('text sent from messennger is: ' + text);
       //handleMessageReply(sender, text);
-      messageHelper.handleMessageReply(sender, text, this.sendTextMessage);
+      messageController.handleMessageReply(sender, USER_SOURCE, text, this.sendTextMessage);
     }
   }
 }
@@ -53,8 +54,8 @@ module.exports.handleWebhookGet = function (req, res) {
 }
 
 module.exports.handleWebhookPost = function (req, res) {
-  console.log('Inside handleWebHook');
-  this.processMessage(req, res);
+  console.log('Inside handleWebHookPost ' + req.body);
+  this.processMessage(req.body);
   //res.status(200).send('Success');
   res.status(200).send('Success');
   //console.log(ss);
@@ -69,15 +70,15 @@ Sample Callback POST
   "object":"page",
   "entry":[
     {
-      "id":"PAGE_ID",
+      "id":"12345",
       "time":1460245674269,
       "messaging":[
         {
           "sender":{
-            "id":"USER_ID"
+            "id":"11111"
           },
           "recipient":{
-            "id":"PAGE_ID"
+            "id":"12345"
           },
           "timestamp":1460245672080,
           "message":{

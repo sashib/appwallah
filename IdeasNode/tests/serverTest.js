@@ -3,17 +3,72 @@ process.env.NODE_ENV = 'test';
 var chai = require('chai'),
     chaiHttp = require('chai-http'),
     sinon = require('sinon'),
+    proxyquire = require('proxyquire'),
     server = require('../server'),
     facebookController = require('../app/controllers/facebookController'),
+    messageHelper = require('../app/helpers/messageHelper'),
     Idea = require('../app/models/idea');
 
 var should = chai.should();
 
 chai.use(chaiHttp);
 
+var sampleFbPost = {
+                      "object":"page",
+                      "entry":[
+                        {
+                          "id":"12345",
+                          "time":1460245674269,
+                          "messaging":[
+                            {
+                              "sender":{
+                                "id":"11111"
+                              },
+                              "recipient":{
+                                "id":"12345"
+                              },
+                              "timestamp":1460245672080,
+                              "message":{
+                                "mid":"mid.1460245671959:dad2ec9421b03d6f78",
+                                "seq":216,
+                                "text":"hello"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    };
+
 describe('Server', function() {   
   describe('/webhook/', function() {
-    it('should return 200 and call processMessage for POST');
+    it('should return 200 and call processMessage for POST', function(done) {
+      var fbContStub = {};
+      fbContStub.sendTextMessage  = function(sender, text) {
+        console.log('sendmsgstub called: ' + sender);
+        sender.should.equal('11111');
+        text.should.equal(messageHelper.ADDED_IDEA);
+        done();
+      };
+      //fbContStub.processMessage = function(reqBody) {
+      //  console.log('processMessage stub called');
+      //};
+      fbContStub.handleWebhookPost = function(req, res) {
+        console.log('stub handle post');
+        fbContStub.processMessage(req.body);
+        res.status(200).send('Success');
+      };
+
+      var s = proxyquire('../server', { './app/controllers/facebookController': fbContStub });
+
+      //proxyquire.callThru();
+      chai.request(s)
+        .post('/webhook/')
+        .send(sampleFbPost)
+        .end(function(err, res) {
+          res.should.have.status(200);
+          //done();
+        });
+    });
   });
 });
 /*

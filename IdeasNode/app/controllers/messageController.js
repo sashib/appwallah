@@ -31,10 +31,10 @@ exports.handleFind = function(sender, senderSource, text, cb) {
 
 }
 
-exports.handleMessageReply = function(sender, text) {
-  if(this.isNewIdea(text)) {
-    this.handleNewIdea(sender, text);
-  } else if (this.isFindByHashTag(text)) {
-    this.handleFind(sender, text);
+exports.handleMessageReply = function(sender, senderSource, text, cb) {
+  if(messageHelper.isNewIdea(text)) {
+    this.handleNewIdea(sender, senderSource, text, cb);
+  } else if (messageHelper.isFindByHashTag(text)) {
+    this.handleFind(sender, senderSource, text, cb);
   }
 }

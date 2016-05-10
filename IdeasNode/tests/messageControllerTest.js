@@ -31,4 +31,8 @@ describe('messageController', function() {
       })
     });
   });
+  describe('handleMessageReply(sender, senderSource, text, cb)', function() {
+    it('should parse text and if it\'s a newidea then call handleNewIdea');
+    it('should parse text and if it\'s a find request then call handleFind');
+  })
 });

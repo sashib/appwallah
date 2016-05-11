@@ -1,8 +1,14 @@
 
-exports.EMPTY_FIND_RESULTS = "Didn\'t find any ideas";
-exports.ADDED_IDEA = "Idea added!";
-
-exports.ERROR_ADDING_IDEA = "Had trouble adding that idea";
+module.exports.EMPTY_FIND_RESULTS = "Didn\'t find any ideas";
+module.exports.ADDED_IDEA = "Idea added!";
+module.exports.ERROR_ADDING_IDEA = "Had trouble adding that idea";
+module.exports.HELP = "Hi! I\'m IdeaWallah. \n\n" +
+                "If you have an idea, just type it, like \"my #awesome idea\". You can" +
+                "use hashtags to categorize your ideas.\n\n" +
+                "Type \"find\" to list your latest ideas\n\n" +
+                "Type \"find awesome\" to search and list ideas with \"awesome\" in it\n\n" +
+                "Type \"tags\" to list your latest used hashtags\n\n" +
+                "That\'s it! More to come later. Enjoy!";
 
 
 module.exports.isNewIdea = function(str) {
@@ -11,10 +17,7 @@ module.exports.isNewIdea = function(str) {
 
 module.exports.isFindByHashTag = function(str) {
   var patt = /^find|^#\w+\b(?! .*)/i;
-  if(patt.test(str))
-  	return true;
-  else 
-  	return false;
+  return (patt.test(str));
 };
 
 module.exports.getFindHashTag = function(str) {
@@ -30,9 +33,6 @@ module.exports.getFindHashTag = function(str) {
 }
 
 module.exports.isHelp = function(str) {
-  var patt = /^help/i;
-  if(patt.test(str))
-  	return true;
-  else 
-  	return false;
+  var patt = /^help$/i;
+  return (patt.test(str));
 };

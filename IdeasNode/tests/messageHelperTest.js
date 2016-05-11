@@ -64,5 +64,12 @@ describe('messageHelper', function() {
     });
   });
   
+  describe('isHelp()', function() {
+    it('should return help info when the text value is \'help\'', function() {
+      var str = 'help';
+      var actual = messageHelper.isHelp(str);
+      expect(actual).to.be.true;
+    });
+  });
 
 });

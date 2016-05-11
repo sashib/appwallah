@@ -2,7 +2,7 @@ var ideas = require('./ideaController'),
     messageHelper = require('../helpers/messageHelper');
 
 
-exports.handleNewIdea = function(sender, senderSource, text, cb) {
+module.exports.handleNewIdea = function(sender, senderSource, text, cb) {
   var callback = function(err) {
     if(err) {
       cb(sender, messageHelper.ERROR_ADDING_IDEA);
@@ -13,7 +13,7 @@ exports.handleNewIdea = function(sender, senderSource, text, cb) {
   ideas.addIdea(sender, senderSource, text, callback);
 }
 
-exports.handleFind = function(sender, senderSource, text, cb) {
+module.exports.handleFind = function(sender, senderSource, text, cb) {
   var callback = function (err, ideas) {
     var ideasStr = "";
     if (!err) {
@@ -31,10 +31,16 @@ exports.handleFind = function(sender, senderSource, text, cb) {
 
 }
 
-exports.handleMessageReply = function(sender, senderSource, text, cb) {
-  if(messageHelper.isNewIdea(text)) {
-    this.handleNewIdea(sender, senderSource, text, cb);
-  } else if (messageHelper.isFindByHashTag(text)) {
+module.exports.handleHelp = function(sender, cb) {
+  cb(sender, messageHelper.HELP);
+}
+
+module.exports.handleMessageReply = function(sender, senderSource, text, cb) {
+  if (messageHelper.isFindByHashTag(text)) {
     this.handleFind(sender, senderSource, text, cb);
+  } else if (messageHelper.isHelp(text)) {
+    this.handleHelp(sender, cb);
+  } else {
+    this.handleNewIdea(sender, senderSource, text, cb);    
   }
 }

@@ -2,6 +2,7 @@ process.env.NODE_ENV = 'test';
 
 var chai = require('chai'),
     sinon = require('sinon'),
+    proxyquire = require('proxyquire'),
     messageHelper = require('../app/helpers/messageHelper'),
     messageController = require('../app/controllers/messageController'),
     Idea = require('../app/models/idea'),
@@ -11,6 +12,18 @@ var expect = chai.expect;
 var should = chai.should();
 
 describe('messageController', function() {  
+  describe('handleHelp()', function() {
+    it('should return help info if text is \'help\'', function(done) {
+      var helpText = messageHelper.HELP;
+      var userId = 'testuser';
+      messageController.handleHelp(userId, function(sender, text) {
+        expect(text).to.equal(helpText);
+        expect(sender).to.equal(userId);
+        done();
+      })
+    });
+  });
+
   describe('handleFind()', function() {
 
     it('should return a list of results matching \'awesome\' if text is \'find awesome\'', function(done) {
@@ -56,7 +69,14 @@ describe('messageController', function() {
       stubHandleFind.restore();
       done();
     });
-    it('should parse text and if it\'s a \'help\' request then call handleHelp');
+    it('should parse text and if it\'s a \'help\' request then call handleHelp', function(done) {
+      var stubHandleHelp = sinon.stub(messageController, "handleHelp");
+      messageController.handleMessageReply('11111', 'developer', 'help', function(){});
+      stubHandleHelp.called.should.be.ok;
+      stubHandleHelp.restore();
+      done();
+
+    });
     it('should parse text and if it\'s a \'tags\' request then call handleListTags');
   })
 });

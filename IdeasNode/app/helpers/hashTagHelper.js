@@ -1,6 +1,7 @@
 
+var hashTagHelper = {};
 
-module.exports.getHashTags = function(str) {
+hashTagHelper.getHashTags = function(str) {
   var hashTags = [];
   //var re = /\#.*?(?=\s|$)/ig;
   var re = /#\w+\b/ig;
@@ -10,3 +11,5 @@ module.exports.getHashTags = function(str) {
   }	
   return hashTags;
 };
+
+module.exports = hashTagHelper;

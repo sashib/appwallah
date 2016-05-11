@@ -39,33 +39,66 @@ var sampleFbPost = {
   ]
 };
 
+var sampleFbPostback = {
+  "object":"page",
+  "entry":[
+    {
+      "id":"12345",
+      "time":1458692752478,
+      "messaging":[
+        {
+          "sender":{
+            "id":"testuser"
+          },
+          "recipient":{
+            "id":"12345"
+          },
+          "timestamp":1458692752478,
+          "postback":{
+            "payload":"{\"sender\":\"testuser\",\"senderSource\":\"development\",\"searchText\":null,\"page\":0}"
+          }
+        }
+      ]
+    }
+  ]
+
+};
+
 describe('Server', function() {   
   describe('/webhook/', function() {
-    it('should return 200 and call processMessage for POST', function(done) {
-      var fbContStub = {};
+    var fbContStub = facebookController;    
+    var s = proxyquire('../server', { './app/controllers/facebookController': fbContStub });
+
+    it('should return 200 and call processMessage and sendTextMessage for POST', function(done) {
       fbContStub.sendTextMessage  = function(sender, text) {
         console.log('sendmsgstub called: ' + sender);
         sender.should.equal('11111');
         text.should.equal(messageHelper.ADDED_IDEA);
+        done();
       };
-      //fbContStub.processMessage = function(reqBody) {
-      //  console.log('processMessage stub called');
-      //};
-      fbContStub.handleWebhookPost = function(req, res) {
-        console.log('stub handle post');
-        fbContStub.processMessage(req.body);
-        res.status(200).send('Success');
-      };
-
-      var s = proxyquire('../server', { './app/controllers/facebookController': fbContStub });
-
-      //proxyquire.callThru();
       chai.request(s)
         .post('/webhook/')
         .send(sampleFbPost)
         .end(function(err, res) {
           res.should.have.status(200);
-          done();
+        });
+    });
+    it('should return 200 and call processMessage and sendTextMessage with payload for POST with Postback', function(done) {
+      fbContStub.sendTextMessage  = function(sender, text, payload) {
+        console.log('sendmsgstub called: ' + sender);
+        var reqObj = fbContStub.getReqObj(sender, text, payload);
+        console.log("payload: " + reqObj.json.message.attachment.payload.buttons[0].payload);
+
+        sender.should.equal('testuser');
+        payload.page.should.equal(1);
+        done();
+      };
+
+      chai.request(s)
+        .post('/webhook/')
+        .send(sampleFbPostback)
+        .end(function(err, res) {
+          res.should.have.status(200);
         });
     });
   });

@@ -1,8 +1,9 @@
 var ideas = require('./ideaController'),
     messageHelper = require('../helpers/messageHelper');
 
+var messageController = {};
 
-module.exports.handleNewIdea = function(sender, senderSource, text, cb) {
+messageController.handleNewIdea = function(sender, senderSource, text, cb) {
   var callback = function(err) {
     if(err) {
       cb(sender, messageHelper.ERROR_ADDING_IDEA);
@@ -13,18 +14,20 @@ module.exports.handleNewIdea = function(sender, senderSource, text, cb) {
   ideas.addIdea(sender, senderSource, text, callback);
 }
 
-module.exports.getPagingPayload = function(sender, senderSource, searchTxt, page) {
+messageController.getPagingPayload = function(sender, senderSource, searchTxt, page) {
   var payload = {};
   payload.sender = sender;
   payload.senderSource = senderSource;
   payload.page = page + 1;
-  payload.search_text = text;
+  payload.searchText = searchTxt;
+  return payload;
 }
 
-module.exports.handleFind = function(sender, senderSource, text, page, cb) {
+messageController.handleFind = function(sender, senderSource, text, page, cb) {
   var searchText = messageHelper.getFindHashTag(text);
-  var payloadNext = this.getPagingPayload(sender, senderSource, searchText, page);
-  
+  var payloadNext = messageController.getPagingPayload(sender, senderSource, searchText, page);
+  var queryLimit = ideas.IDEA_QUERY_LIMIT;
+
   var callback = function (err, ideas) {
     var ideasStr = "";
     console.log("ideas len is: " + ideas.length);
@@ -40,7 +43,11 @@ module.exports.handleFind = function(sender, senderSource, text, page, cb) {
         for (i=0; i < ideas.length; i++) {
            ideasStr += ideas[i].description + '\n\n';
         }
+        if (ideas.length < queryLimit) {
+          payloadNext = null;
+        }
       }
+
     } 
     cb(sender, ideasStr, payloadNext);
     
@@ -49,20 +56,24 @@ module.exports.handleFind = function(sender, senderSource, text, page, cb) {
 
 }
 
-module.exports.handleHelp = function(sender, cb) {
+messageController.handleHelp = function(sender, cb) {
   cb(sender, messageHelper.HELP);
 }
 
-module.exports.handleMessageReply = function(sender, senderSource, text, cb) {
+messageController.handleMessageReply = function(sender, senderSource, text, cb) {
   if (messageHelper.isFindByHashTag(text)) {
-    this.handleFind(sender, senderSource, text, 0, cb);
+    messageController.handleFind(sender, senderSource, text, 0, cb);
   } else if (messageHelper.isHelp(text)) {
-    this.handleHelp(sender, cb);
+    messageController.handleHelp(sender, cb);
   } else {
-    this.handleNewIdea(sender, senderSource, text, cb);    
+    messageController.handleNewIdea(sender, senderSource, text, cb);    
   }
 }
 
-module.exports.handlePostback = function(payload, cb) {
-
+messageController.handlePostback = function(payloadStr, cb) {
+  console.log("handlePostback: " + payloadStr);
+  var payload = JSON.parse(payloadStr);
+  messageController.handleFind(payload.sender, payload.senderSource, payload.searchText, payload.page, cb);
 }
+
+module.exports = messageController;

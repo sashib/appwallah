@@ -1,27 +1,30 @@
 
-module.exports.NO_MORE_SEARCH_RESULTS = "That\'s all there is";
-module.exports.EMPTY_FIND_RESULTS = "Didn\'t find any ideas";
-module.exports.ADDED_IDEA = "Idea added!";
-module.exports.ERROR_ADDING_IDEA = "Had trouble adding that idea";
-module.exports.HELP = "Hi! I\'m IdeaWallah. \n\n" +
-                "If you have an idea, just type it, like \"my #awesome idea\". You can" +
-                "use hashtags to categorize your ideas.\n\n" +
-                "Type \"find\" to list your latest ideas\n\n" +
-                "Type \"find awesome\" to search and list ideas with \"awesome\" in it\n\n" +
-                "Type \"tags\" to list your latest used hashtags\n\n" +
-                "That\'s it! More to come later. Enjoy!";
+var messageHelper = {};
+
+messageHelper.NO_MORE_SEARCH_RESULTS = "That\'s all there is";
+messageHelper.EMPTY_FIND_RESULTS = "Didn\'t find any ideas";
+messageHelper.ADDED_IDEA = "Idea added!";
+messageHelper.ERROR_ADDING_IDEA = "Had trouble adding that idea";
+messageHelper.HELP = "Hi! I\'m IdeaWallah. Here\'s how I can help:\n\n" +
+                "If you have an idea, just type it, like \"my #awesome idea\" and" +
+                " I\'ll save it for you. You can " +
+                "use hashtags to categorize your ideas to easily find them later.\n\n" +
+                "Type \"find\" to list your latest ideas. Or, " +
+                "type \"find awesome\" to search and list ideas with \"awesome\" in it.\n\n" +
+                //"Type \"tags\" or \"hashtags\" to list your latest used hashtags\n\n" +
+                "That\'s it. More to come later. \n\nEnjoy!";
 
 
-module.exports.isNewIdea = function(str) {
-  return (!this.isFindByHashTag(str) && !this.isHelp(str));
+messageHelper.isNewIdea = function(str) {
+  return (!messageHelper.isFindByHashTag(str) && !messageHelper.isHelp(str));
 };
 
-module.exports.isFindByHashTag = function(str) {
+messageHelper.isFindByHashTag = function(str) {
   var patt = /^find|^#\w+\b(?! .*)/i;
   return (patt.test(str));
 };
 
-module.exports.getFindHashTag = function(str) {
+messageHelper.getFindHashTag = function(str) {
   var hashTags = [];
   //var re = /\#.*?(?=\s|$)/ig;
   var re = /find (.*)/i;
@@ -31,9 +34,11 @@ module.exports.getFindHashTag = function(str) {
   	hashTag = hashTags[1];
   }
   return hashTag;
-}
+};
 
-module.exports.isHelp = function(str) {
+messageHelper.isHelp = function(str) {
   var patt = /^help$/i;
   return (patt.test(str));
 };
+
+module.exports = messageHelper;

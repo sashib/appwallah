@@ -1,21 +1,17 @@
 var request = require('request'),
+    facebookConfig = require('../../config/facebook'),
 	  messageController = require('./messageController');
 
- // Facebook Page Token for App
-module.exports.TOKEN = "EAADXCiPJb3MBAO3vDGcguiMv9nzOfq71yrpl3L4PQ7bhXNuaZAioYZBx3d8JIOwOIfyNlqctts5hkqPWsqinMw6jwi4MCHlHkH6QidIYZBeLWR5qY8lGwwYsnXSiSw0BDjiaEbkoWZBwvFj2VM9IWxyl7fJHmyo0OwSK5nn9ygZDZD";
-// Source of userIds
-module.exports.USER_SOURCE = "facebook";
+var facebookController = {};
 
-module.exports.FB_POST_URL = "https://graph.facebook.com/v2.6/me/messages";
-
-module.exports.buttonTemplatePagingJson = function(sender, text, payloadObj) {
+facebookController.buttonTemplatePagingJson = function(sender, text, payloadObj) {
   var json = {};
   json.recipient = { id:sender };
   var buttons = [
     {
        type:"postback",
        title:"More...",
-       payload:payloadObj
+       payload:JSON.stringify(payloadObj)
     }
   ];
 
@@ -34,7 +30,7 @@ module.exports.buttonTemplatePagingJson = function(sender, text, payloadObj) {
   return json;
 }
 
-module.exports.messageJson = function(sender, text) {
+facebookController.messageJson = function(sender, text) {
   var json = {};
   json.recipient = { id: sender };
   var messageData = { text: text };
@@ -42,17 +38,17 @@ module.exports.messageJson = function(sender, text) {
   return json;
 }
 
-module.exports.getReqObj = function(sender, text, payload) {
+facebookController.getReqObj = function(sender, text, payload) {
   var jsonObj;
   if (payload == null) {
-    jsonObj = this.messageJson(sender, text);
+    jsonObj = facebookController.messageJson(sender, text);
   } else {
-    jsonObj = this.buttonTemplatePagingJson(sender, text, payload);
+    jsonObj = facebookController.buttonTemplatePagingJson(sender, text, payload);
   }
 
   var reqObj = {
-    url: this.FB_POST_URL,
-    qs: {access_token:this.TOKEN},
+    url: facebookConfig.postUrl,
+    qs: {access_token:facebookConfig.pageToken},
     method: 'POST',
     json: jsonObj
   };
@@ -60,9 +56,10 @@ module.exports.getReqObj = function(sender, text, payload) {
   return reqObj
 }
 
-module.exports.sendTextMessage = function(sender, text, payload) {
+facebookController.sendTextMessage = function(sender, text, payload) {
 
-  var reqObj = this.getReqObj(sender, text, payload);
+  console.log("in sendTextMessage, sender: " + sender + ", payload: " + JSON.stringify(payload));
+  var reqObj = facebookController.getReqObj(sender, text, payload);
 
   request(reqObj, function(error, response, body) {
     if (error) {
@@ -73,26 +70,23 @@ module.exports.sendTextMessage = function(sender, text, payload) {
   });
 }
 
-module.exports.processMessage = function(reqBody) {
+facebookController.processMessage = function(reqBody) {
   //looking at only the first entry
-  console.log('in process message: ');
+  console.log('processmessage');
   messaging_events = reqBody.entry[0].messaging;
   for (i = 0; i < messaging_events.length; i++) {
     event = reqBody.entry[0].messaging[i];
     sender = event.sender.id;
     if (event.message && event.message.text) {
       text = event.message.text;
-      // Handle a text message from this sender
-      console.log('text sent from messennger is: ' + text);
-      //handleMessageReply(sender, text);
-      messageController.handleMessageReply(sender, this.USER_SOURCE, text, this.sendTextMessage);
+      messageController.handleMessageReply(sender, facebookConfig.source, text, facebookController.sendTextMessage);
     } else if (event.postback) {
-      messageController.handlePostback(event.postback.payload, this.sendTextMessage);
+      messageController.handlePostback(event.postback.payload, facebookController.sendTextMessage);
     }
   }
 }
 
-module.exports.handleWebhookGet = function (req, res) {
+facebookController.handleWebhookGet = function (req, res) {
   console.log('Inside handleWebHookGet');
   if (req.query['hub.verify_token'] === '<validation_token>') {
     res.send(req.query['hub.challenge']);
@@ -100,13 +94,14 @@ module.exports.handleWebhookGet = function (req, res) {
   res.send('Error, wrong validation token');
 }
 
-module.exports.handleWebhookPost = function (req, res) {
-  console.log('Inside handleWebHookPost ' + req.body);
-  this.processMessage(req.body);
+facebookController.handleWebhookPost = function (req, res) {
+
+  console.log('in handleWebhookPost: ' + JSON.stringify(req.body));
+  facebookController.processMessage(req.body);
   res.status(200).send('Success');
 } 
 
-
+module.exports = facebookController;
 
 /*
 Basic Message
@@ -165,6 +160,31 @@ Sample Callback POST
             "mid":"mid.1460245671959:dad2ec9421b03d6f78",
             "seq":216,
             "text":"hello"
+          }
+        }
+      ]
+    }
+  ]
+}
+
+Sample Callback for Postback
+{
+  "object":"page",
+  "entry":[
+    {
+      "id":PAGE_ID,
+      "time":1458692752478,
+      "messaging":[
+        {
+          "sender":{
+            "id":USER_ID
+          },
+          "recipient":{
+            "id":PAGE_ID
+          },
+          "timestamp":1458692752478,
+          "postback":{
+            "payload":"USER_DEFINED_PAYLOAD"
           }
         }
       ]

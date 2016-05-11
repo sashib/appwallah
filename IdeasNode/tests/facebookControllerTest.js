@@ -5,7 +5,8 @@ var should = require('chai').should(),
     req = require('Request'),
     proxyquire = require('proxyquire'),
     messageHelper = require('../app/helpers/messageHelper'),
-    facebook = require('../app/controllers/facebookController');
+    facebook = require('../app/controllers/facebookController'),
+    fbConfig = require('../config/facebook');
 
 var sampleFbPostBody = {
   "object":"page",
@@ -133,9 +134,9 @@ describe('facebook', function() {
       var text = messageHelper.ADDED_IDEA;
 
       var request = function(obj, cb) {
-        obj.url.should.equal(facebook.FB_POST_URL);
+        obj.url.should.equal(fbConfig.postUrl);
         obj.method.should.equal("POST");
-        obj.qs.access_token.should.equal(facebook.TOKEN);
+        obj.qs.access_token.should.equal(fbConfig.pageToken);
         obj.json.recipient.id.should.equal(sender);
         obj.json.message.text.should.equal(text);
         done();
@@ -146,16 +147,16 @@ describe('facebook', function() {
     });
     it('should make a buttonTemplate POST request', function(done) {
       var sender = "11111";
-      var payload = "sample payload";
+      var payload = {sender:'11111', senderSource:'development', searchText:null, page:1};
       var text = "my ideas";
       var templateJson = facebook.buttonTemplatePagingJson(sender, text, payload);
 
       var request = function(obj, cb) {
-        obj.url.should.equal(facebook.FB_POST_URL);
+        obj.url.should.equal(fbConfig.postUrl);
         obj.method.should.equal("POST");
-        obj.qs.access_token.should.equal(facebook.TOKEN);
+        obj.qs.access_token.should.equal(fbConfig.pageToken);
         obj.json.recipient.id.should.equal(sender);
-        obj.json.message.attachment.payload.buttons[0].payload.should.equal(payload);
+        obj.json.message.attachment.payload.buttons[0].payload.should.equal(JSON.stringify(payload));
         done();
       };
       var facebookCont = proxyquire('../app/controllers/facebookController', {'request':request});

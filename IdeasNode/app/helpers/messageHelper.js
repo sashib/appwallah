@@ -1,4 +1,5 @@
 
+module.exports.NO_MORE_SEARCH_RESULTS = "That\'s all there is";
 module.exports.EMPTY_FIND_RESULTS = "Didn\'t find any ideas";
 module.exports.ADDED_IDEA = "Idea added!";
 module.exports.ERROR_ADDING_IDEA = "Had trouble adding that idea";

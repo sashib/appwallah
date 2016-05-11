@@ -25,16 +25,30 @@ describe('messageController', function() {
   });
 
   describe('handleFind()', function() {
-
+    var text = 'find awesome';
+    var userId = 'testuser';
+    var userSource = 'development';
+    var expected = 'a sixth #beautiful #grand new #awesome #idea';//\n\na third #grand new #awesome #idea\n\na fourth new #awesome #idea\n\n';
+    
     it('should return a list of results matching \'awesome\' if text is \'find awesome\'', function(done) {
-      var text = 'find awesome';
-      var userId = 'testuser';
-      var userSource = 'development';
-      var expected = 'a sixth #beautiful #grand new #awesome #idea';//\n\na third #grand new #awesome #idea\n\na fourth new #awesome #idea\n\n';
-      messageController.handleFind(userId, userSource, text, function(sender, text) {
+      messageController.handleFind(userId, userSource, 0, text, function(sender, text) {
         expect(text).to.contain(expected);
         done();
-      })
+      });
+    });
+    it('should return \"' + messageHelper.EMPTY_FIND_RESULTS + '\" if no results were found', function(done) {
+      var testText = 'find sdafdswer';
+      messageController.handleFind(userId, userSource, testText, 0, function(sender, txt) {
+        expect(txt).to.equal(messageHelper.EMPTY_FIND_RESULTS );
+        done();
+      });      
+    });
+    it('should return \"' + messageHelper.NO_MORE_SEARCH_RESULTS + '\" if no more pages for results', function(done) {
+      messageController.handleFind(userId, userSource, text, 1, function(sender, txt) {
+        expect(txt).to.equal(messageHelper.NO_MORE_SEARCH_RESULTS);
+        done();
+      });
+
     });
   });
 
@@ -78,5 +92,8 @@ describe('messageController', function() {
 
     });
     it('should parse text and if it\'s a \'tags\' request then call handleListTags');
+  });
+  describe('handlePostback(payload)', function() {
+    it('should return list of results for the page in payload');
   })
 });

@@ -14,30 +14,30 @@ var should = chai.should();
 chai.use(chaiHttp);
 
 var sampleFbPost = {
-                      "object":"page",
-                      "entry":[
-                        {
-                          "id":"12345",
-                          "time":1460245674269,
-                          "messaging":[
-                            {
-                              "sender":{
-                                "id":"11111"
-                              },
-                              "recipient":{
-                                "id":"12345"
-                              },
-                              "timestamp":1460245672080,
-                              "message":{
-                                "mid":"mid.1460245671959:dad2ec9421b03d6f78",
-                                "seq":216,
-                                "text":"hello"
-                              }
-                            }
-                          ]
-                        }
-                      ]
-                    };
+  "object":"page",
+  "entry":[
+    {
+      "id":"12345",
+      "time":1460245674269,
+      "messaging":[
+        {
+          "sender":{
+            "id":"11111"
+          },
+          "recipient":{
+            "id":"12345"
+          },
+          "timestamp":1460245672080,
+          "message":{
+            "mid":"mid.1460245671959:dad2ec9421b03d6f78",
+            "seq":216,
+            "text":"hello"
+          }
+        }
+      ]
+    }
+  ]
+};
 
 describe('Server', function() {   
   describe('/webhook/', function() {

@@ -8,20 +8,63 @@ module.exports.USER_SOURCE = "facebook";
 
 module.exports.FB_POST_URL = "https://graph.facebook.com/v2.6/me/messages";
 
+module.exports.buttonTemplatePagingJson = function(sender, text, payloadObj) {
+  var json = {};
+  json.recipient = { id:sender };
+  var buttons = [
+    {
+       type:"postback",
+       title:"More...",
+       payload:payloadObj
+    }
+  ];
 
-module.exports.sendTextMessage = function(sender, text) {
-  messageData = {
-    text:text
+  var payload = {
+    template_type:"button",
+    text: text,
+    buttons: buttons
+  };
+  var attachment = {
+    type:"template",
+    payload: payload
+  };
+
+  json.message = { attachment: attachment };
+
+  return json;
+}
+
+module.exports.messageJson = function(sender, text) {
+  var json = {};
+  json.recipient = { id: sender };
+  var messageData = { text: text };
+  json.message = messageData;
+  return json;
+}
+
+module.exports.getReqObj = function(sender, text, payload) {
+  var jsonObj;
+  if (payload == null) {
+    jsonObj = this.messageJson(sender, text);
+  } else {
+    jsonObj = this.buttonTemplatePagingJson(sender, text, payload);
   }
-  request({
+
+  var reqObj = {
     url: this.FB_POST_URL,
     qs: {access_token:this.TOKEN},
     method: 'POST',
-    json: {
-      recipient: {id:sender},
-      message: messageData,
-    }
-  }, function(error, response, body) {
+    json: jsonObj
+  };
+
+  return reqObj
+}
+
+module.exports.sendTextMessage = function(sender, text, payload) {
+
+  var reqObj = this.getReqObj(sender, text, payload);
+
+  request(reqObj, function(error, response, body) {
     if (error) {
       console.log('Error sending message: ', error);
     } else if (response.body.error) {
@@ -43,6 +86,8 @@ module.exports.processMessage = function(reqBody) {
       console.log('text sent from messennger is: ' + text);
       //handleMessageReply(sender, text);
       messageController.handleMessageReply(sender, this.USER_SOURCE, text, this.sendTextMessage);
+    } else if (event.postback) {
+      messageController.handlePostback(event.postback.payload, this.sendTextMessage);
     }
   }
 }
@@ -58,14 +103,47 @@ module.exports.handleWebhookGet = function (req, res) {
 module.exports.handleWebhookPost = function (req, res) {
   console.log('Inside handleWebHookPost ' + req.body);
   this.processMessage(req.body);
-  //res.status(200).send('Success');
   res.status(200).send('Success');
-  //console.log(ss);
 } 
 
 
 
 /*
+Basic Message
+{
+    "recipient":{
+        "id":"USER_ID"
+    }, 
+    "message":{
+        "text":"hello, world!"
+    }
+
+Sample Button Template
+  "recipient":{
+    "id":"USER_ID"
+  },
+  "message":{
+    "attachment":{
+      "type":"template",
+      "payload":{
+        "template_type":"button",
+        "text":"What do you want to do next?",
+        "buttons":[
+          {
+            "type":"web_url",
+            "url":"https://petersapparel.parseapp.com",
+            "title":"Show Website"
+          },
+          {
+            "type":"postback",
+            "title":"Start Chatting",
+            "payload":"USER_DEFINED_PAYLOAD"
+          }
+        ]
+      }
+    }
+  }
+
 Sample Callback POST
 
 {

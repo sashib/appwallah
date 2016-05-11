@@ -15,7 +15,27 @@ describe('ideaController', function() {
         ideas.should.have.lengthOf(3);
         done();
       };
-      ideaController.find(sender, senderSource, text, cb);
+      ideaController.find(sender, senderSource, text, 0, cb);
+    });
+    it('should return first page of 5 results', function(done) {
+      var text = '';
+      var sender = 'testuser';
+      var senderSource = 'development';
+      var cb = function(err, ideas) {
+        ideas.should.have.lengthOf(5);
+        done();
+      };
+      ideaController.find(sender, senderSource, text, 0, cb);
+    });
+    it('should return second page of 1 results', function(done) {
+      var text = '';
+      var sender = 'testuser';
+      var senderSource = 'development';
+      var cb = function(err, ideas) {
+        ideas.should.have.lengthOf(1);
+        done();
+      };
+      ideaController.find(sender, senderSource, text, 1, cb);
     });
   });
 

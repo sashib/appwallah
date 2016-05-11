@@ -28,12 +28,13 @@ module.exports.addIdea = function(userId, userSource, str, callback) {
   idea.save(callback);  
 };
 
-module.exports.find = function(userId, userSource, hashTag, callback) {
-  if (hashTag != null) {
-    Idea.find({$text: {$search: hashTag}})
+module.exports.find = function(userId, userSource, searchTxt, page, callback) {
+  if (searchTxt != null && searchTxt != '') {
+    Idea.find({$text: {$search: searchTxt}})
     .where('userId').equals(userId)
     .where('userSource').equals(userSource)
     .limit(IDEA_QUERY_LIMIT)
+    .skip(IDEA_QUERY_LIMIT * page)
     .sort(IDEA_QUERY_SORT_ORDER)
     .exec(callback);
   } else {
@@ -41,6 +42,7 @@ module.exports.find = function(userId, userSource, hashTag, callback) {
     .where('userId').equals(userId)
     .where('userSource').equals(userSource)
     .limit(IDEA_QUERY_LIMIT)
+    .skip(IDEA_QUERY_LIMIT * page)
     .sort(IDEA_QUERY_SORT_ORDER)
     .exec(callback);
   }

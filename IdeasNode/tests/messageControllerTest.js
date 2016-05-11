@@ -1,10 +1,14 @@
 process.env.NODE_ENV = 'test';
 
-var expect = require('chai').expect,
+var chai = require('chai'),
+    sinon = require('sinon'),
     messageHelper = require('../app/helpers/messageHelper'),
     messageController = require('../app/controllers/messageController'),
     Idea = require('../app/models/idea'),
     testData = require('./testData');
+
+var expect = chai.expect;
+var should = chai.should();
 
 describe('messageController', function() {  
   describe('handleFind()', function() {
@@ -32,7 +36,27 @@ describe('messageController', function() {
     });
   });
   describe('handleMessageReply(sender, senderSource, text, cb)', function() {
-    it('should parse text and if it\'s a newidea then call handleNewIdea');
-    it('should parse text and if it\'s a find request then call handleFind');
+    it('should parse text and if it\'s a newidea then call handleNewIdea', function(done) {
+      var stubHandleNewIdea = sinon.stub(messageController, "handleNewIdea");
+      messageController.handleMessageReply('11111', 'developer', 'some new #idea', function(){});
+      stubHandleNewIdea.called.should.be.ok;
+      done();
+    });
+    it('should parse text and if it\'s a \'find something\' request then call handleFind', function(done) {
+      var stubHandleFind = sinon.stub(messageController, "handleFind");
+      messageController.handleMessageReply('11111', 'developer', 'find #idea', function(){});
+      stubHandleFind.called.should.be.ok;
+      stubHandleFind.restore();
+      done();
+    });
+    it('should parse text and if it\'s a \'find\' request then call handleFind', function(done) {
+      var stubHandleFind = sinon.stub(messageController, "handleFind");
+      messageController.handleMessageReply('11111', 'developer', 'find', function(){});
+      stubHandleFind.called.should.be.ok;
+      stubHandleFind.restore();
+      done();
+    });
+    it('should parse text and if it\'s a \'help\' request then call handleHelp');
+    it('should parse text and if it\'s a \'tags\' request then call handleListTags');
   })
 });

@@ -2,9 +2,11 @@ var request = require('request'),
 	  messageController = require('./messageController');
 
  // Facebook Page Token for App
-var TOKEN = "EAADXCiPJb3MBAO3vDGcguiMv9nzOfq71yrpl3L4PQ7bhXNuaZAioYZBx3d8JIOwOIfyNlqctts5hkqPWsqinMw6jwi4MCHlHkH6QidIYZBeLWR5qY8lGwwYsnXSiSw0BDjiaEbkoWZBwvFj2VM9IWxyl7fJHmyo0OwSK5nn9ygZDZD";
+module.exports.TOKEN = "EAADXCiPJb3MBAO3vDGcguiMv9nzOfq71yrpl3L4PQ7bhXNuaZAioYZBx3d8JIOwOIfyNlqctts5hkqPWsqinMw6jwi4MCHlHkH6QidIYZBeLWR5qY8lGwwYsnXSiSw0BDjiaEbkoWZBwvFj2VM9IWxyl7fJHmyo0OwSK5nn9ygZDZD";
 // Source of userIds
-var USER_SOURCE = "facebook";
+module.exports.USER_SOURCE = "facebook";
+
+module.exports.FB_POST_URL = "https://graph.facebook.com/v2.6/me/messages";
 
 
 module.exports.sendTextMessage = function(sender, text) {
@@ -12,8 +14,8 @@ module.exports.sendTextMessage = function(sender, text) {
     text:text
   }
   request({
-    url: 'https://graph.facebook.com/v2.6/me/messages',
-    qs: {access_token:TOKEN},
+    url: this.FB_POST_URL,
+    qs: {access_token:this.TOKEN},
     method: 'POST',
     json: {
       recipient: {id:sender},
@@ -40,7 +42,7 @@ module.exports.processMessage = function(reqBody) {
       // Handle a text message from this sender
       console.log('text sent from messennger is: ' + text);
       //handleMessageReply(sender, text);
-      messageController.handleMessageReply(sender, USER_SOURCE, text, this.sendTextMessage);
+      messageController.handleMessageReply(sender, this.USER_SOURCE, text, this.sendTextMessage);
     }
   }
 }

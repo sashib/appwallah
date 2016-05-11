@@ -47,7 +47,6 @@ describe('Server', function() {
         console.log('sendmsgstub called: ' + sender);
         sender.should.equal('11111');
         text.should.equal(messageHelper.ADDED_IDEA);
-        done();
       };
       //fbContStub.processMessage = function(reqBody) {
       //  console.log('processMessage stub called');
@@ -66,7 +65,7 @@ describe('Server', function() {
         .send(sampleFbPost)
         .end(function(err, res) {
           res.should.have.status(200);
-          //done();
+          done();
         });
     });
   });

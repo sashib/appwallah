@@ -90,6 +90,21 @@ describe('facebook', function() {
   });
 
   describe('sendTextMessage()', function() {
-    it('should make a POST request with the sender and message');
+    it('should make a POST request with the sender and message', function(done) {
+      var sender = "11111";
+      var text = messageHelper.ADDED_IDEA;
+
+      var request = function(obj, cb) {
+        obj.url.should.equal(facebook.FB_POST_URL);
+        obj.method.should.equal("POST");
+        obj.qs.access_token.should.equal(facebook.TOKEN);
+        obj.json.recipient.id.should.equal(sender);
+        obj.json.message.text.should.equal(text);
+        done();
+      };
+      var facebookCont = proxyquire('../app/controllers/facebookController', {'request':request});
+      
+      facebookCont.sendTextMessage(sender, text);
+    });
   })
 });

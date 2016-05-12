@@ -3,6 +3,9 @@ var ideas = require('./ideaController'),
 
 var messageController = {};
 
+messageController.MAX_CHARS_PER_IDEA = 60;
+messageController.MAX_CHARS_PER_TEXT = 320;
+
 messageController.handleNewIdea = function(sender, senderSource, text, cb) {
   var callback = function(err) {
     if(err) {
@@ -26,10 +29,11 @@ messageController.getPagingPayload = function(sender, senderSource, searchTxt, p
 messageController.handleFind = function(sender, senderSource, text, page, cb) {
   var searchText = messageHelper.getFindHashTag(text);
   var payloadNext = messageController.getPagingPayload(sender, senderSource, searchText, page);
-  var queryLimit = ideas.IDEA_QUERY_LIMIT;
+  var queryLimit = ideas.IDEA_QUERY_LIMIT;  
 
   var callback = function (err, ideas) {
     var ideasStr = "";
+    var ideasShortStr = "";
     console.log("ideas len is: " + ideas.length);
     if (!err) {
       if (ideas.length <= 0) {
@@ -41,10 +45,19 @@ messageController.handleFind = function(sender, senderSource, text, page, cb) {
         payloadNext = null;
       } else {
         for (i=0; i < ideas.length; i++) {
-           ideasStr += ideas[i].description + '\n\n';
+          var desc = ideas[i].description;
+          var descShort = desc;
+          if (descShort.length > messageController.MAX_CHARS_PER_IDEA) {
+            descShort = descShort.substring(0, messageController.MAX_CHARS_PER_IDEA) + '..';
+          }
+          ideasStr += desc + '\n\n';
+          ideasShortStr += descShort + '\n\n';
         }
         if (ideas.length < queryLimit) {
           payloadNext = null;
+        }
+        if (ideasStr.length > messageController.MAX_CHARS_PER_TEXT) {
+          ideasStr = ideasShortStr;
         }
       }
 

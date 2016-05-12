@@ -4,6 +4,8 @@ var request = require('request'),
 
 var facebookController = {};
 
+/* TEXT SENT TO FB MUST BE 320 CHARS OR LESS */
+
 facebookController.buttonTemplatePagingJson = function(sender, text, payloadObj) {
   var json = {};
   json.recipient = { id:sender };

@@ -47,6 +47,15 @@ describe('messageController', function() {
       });
 
     });
+    it('should return a list of results with ... if total result str is more then ' + messageController.MAX_CHARS_PER_TEXT, function(done) {
+        var ellipsesExp = 'a fifth #amazing idea 12345678987654321123456789876543219999999999';
+        messageController.handleFind(userId, userSource, 'find', 0, function(sender, text, payload) {
+        expect(text).to.contain(ellipsesExp);
+        done();
+      });
+
+    });
+
     it('should return a list of results and no payload to the callback if results are 5 or less', function(done) {
         messageController.handleFind(userId, userSource, 'find awesome', 0, function(sender, text, payload) {
         expect(text).to.contain(expected);

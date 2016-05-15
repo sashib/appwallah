@@ -6,22 +6,53 @@
     <link rel="stylesheet" href="main.css">  
   </head>
   <body>
-    <div id="title">
-      Appwallah
-    </div>
-    <div id="subtitle">
-      messenger bots that will help you be happy and healthy
-    </div>
-    <div id="divider"></div>
+    <div id="main">
+    <div id="ideasphone"></div>
     <div id="ideas-main">
       <div id="ideas-logo"></div>
       <div id="ideas-content">
-        <div class="apptitle">IdeaWallah</div>
+        <div class="apptitle">Ideawallah</div>
         <div class="content">
-        It's a well known practice that coming up with ideas regularily will help keep your mind sharp and keep your enthusiasm levels up. Not to mention that being an "Idea Person" is becoming one of the most differentiating qualities in today's world. <br/><br/>Whether it's ideas for new businesses, home improvement, movie plots, artwork, or anything else - IdeaWallah will help you store your ideas, reference them in the future and make sure you keep coming up with fresh new ideas every day!
+          facebook messenger bot that will help you become an idea machine!
         </div>
       </div>
+      <div id="fb-messenger-button">
+        <div class="fb-messengermessageus" 
+          messenger_app_id="236438550048627" 
+          page_id="267140500293954"
+          color="blue"
+          size="xlarge" >
+        </div>
+      </div>
+    </div>    
     </div>
-    
+    <div id="footer">
+      &copy; 2016 APPWALLAH
+    </div>
   </body>
+  <script type="text/javascript">
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '236438550048627',
+        xfbml      : true,
+        version    : 'v2.6'
+      });
+    };
+
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement(s); js.id = id;
+       js.src = "//connect.facebook.net/en_US/sdk.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
+    
+    if (screen.width <= 800) {
+      document.getElementById("main").style.width = "100%";
+      document.getElementById("main").style.marginTop = "20px";      
+      document.getElementById("ideasphone").style.display = "none";
+      document.getElementById("ideas-main").style.margin = "auto";
+      document.getElementById("footer").style.marginTop = 0;
+    }
+  </script>
 </html>

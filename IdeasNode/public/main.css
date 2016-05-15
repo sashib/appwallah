@@ -1,6 +1,8 @@
 body {
   font-family: 'Roboto', sans-serif;
   text-align: center;
+  margin: auto;
+  background-color: #f8f8f8;
 }
 
 #title {
@@ -21,35 +23,61 @@ body {
   margin: auto;
   margin-top: 30px;
   padding-top: 40px;
-  border-top: solid 2px #dcdcdc;
+}
+
+#main {
+  width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 100px;
+  margin-bottom: auto;
 }
 
 #ideas-main {
-	margin-top: 20px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 425px;
+  width: 278px;
+  background-color: #ffffff;
+  margin-left: 450px;
+  padding: 20px;
+  padding-bottom: 15px;
+  border: 1px solid #efefef;
 }
 
+#ideasphone {
+  background-image: url("phone1.png");
+  background-repeat: no-repeat;
+  margin-left: -40px;
+  margin-top:-125px;
+  width: 480px;
+  height: 823px;
+  float:left;
+
+
+}
 #ideas-logo {
   background-image: url("ideawallah.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100px 100px;
-  width: 100px;
-  height: 100px;
-  float: left;
+  width: 100%;
+  height: 25%;
 }
 
 #ideas-content {
-  width:300px;
-  float:right;
-  text-align: left;  
+  text-align: center;  
 }
+
+#fb-messenger-button {
+  width:180px;
+  margin: auto;
+  padding:30px;
+}
+
 
 .apptitle {
   color:#000000;
   font-weight: bold;
+  font-size:20pt;
+  line-height: 2em;
 
 }
 
@@ -58,4 +86,15 @@ body {
   color:#444444;
   margin-top: 10px;
   line-height: 1.75em;
+}
+
+#footer {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 305px;
+  margin-bottom:30px;
+  padding: 20px;
+  text-align: center;
+  font-size: 10pt;
+  color: #888888;
 }

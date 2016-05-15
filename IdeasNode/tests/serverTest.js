@@ -73,7 +73,7 @@ describe('Server', function() {
       fbContStub.sendTextMessage  = function(sender, text) {
         console.log('sendmsgstub called: ' + sender);
         sender.should.equal('11111');
-        text.should.equal(messageHelper.ADDED_IDEA);
+        text.should.equal("1" + messageHelper.ADDED_IDEA_TODAY);
         done();
       };
       chai.request(s)

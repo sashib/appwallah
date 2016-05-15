@@ -17,6 +17,17 @@ describe('ideaController', function() {
       };
       ideaController.find(sender, senderSource, text, 0, cb);
     });
+    it('should return a list of results matching \'first idea\'', function(done) {
+      var text = 'first';
+      var sender = 'testuser';
+      var senderSource = 'development';
+      var cb = function(err, ideas) {
+        ideas.should.have.lengthOf(1);
+        ideas[0].description.should.equal('a first idea #idea 12345678987654321123456789876543219999999999');
+        done();
+      };
+      ideaController.find(sender, senderSource, text, 0, cb);
+    });
     it('should return first page of 5 results', function(done) {
       var text = '';
       var sender = 'testuser';

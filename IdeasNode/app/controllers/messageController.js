@@ -7,11 +7,11 @@ messageController.MAX_CHARS_PER_IDEA = 60;
 messageController.MAX_CHARS_PER_TEXT = 320;
 
 messageController.handleNewIdea = function(sender, senderSource, text, cb) {
-  var callback = function(err) {
+  var callback = function(err, idea) {
     if(err) {
       cb(sender, messageHelper.ERROR_ADDING_IDEA);
     } else {
-      cb(sender, messageHelper.ADDED_IDEA);
+      ideas.getTodayIdeas(sender, senderSource, cb);
     }
   }
   ideas.addIdea(sender, senderSource, text, callback);

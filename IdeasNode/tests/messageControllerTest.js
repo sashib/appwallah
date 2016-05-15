@@ -106,8 +106,10 @@ describe('messageController', function() {
     it('should return ' + messageHelper.ADDED_IDEA + ' if text is \'some new #idea test\'', function(done) {
       var text = 'some new #idea test';
       var sender = 'testsender';
+      var expected = "1" + messageHelper.ADDED_IDEA_TODAY;
       messageController.handleNewIdea(sender, 'development', text, function(sender, text) {
-        expect(text).to.equal(messageHelper.ADDED_IDEA);
+        //expect(text).to.equal(messageHelper.ADDED_IDEA);
+        expect(text).to.equal(expected);
         done();
       })
     });

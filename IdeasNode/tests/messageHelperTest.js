@@ -50,17 +50,26 @@ describe('messageHelper', function() {
   });
   
   describe('getFindHashTag()', function () {
-    it('should return \'#idea\' when the value is \'find #idea\'', function () {
+    it('should return \'#idea\' when the value is \'find #idea\'', function (done) {
       var testStr = 'find #idea';
       var actual = messageHelper.getFindHashTag(testStr);
       var expected = "#idea";
       expect(actual).to.eql(expected);
+      done();
     });
-    it('should return null when the value is \'find\'', function () {
+    it('should return \'other #new #idea\' when the value is \'find other #new #idea\'', function (done) {
+      var testStr = 'find other #new #idea';
+      var actual = messageHelper.getFindHashTag(testStr);
+      var expected = "other #new #idea";
+      expect(actual).to.eql(expected);
+      done();
+    });
+    it('should return null when the value is \'find\'', function (done) {
       var testStr = 'find';
       var actual = messageHelper.getFindHashTag(testStr);
       var expected = null;
       expect(actual).to.eql(expected);
+      done();
     });
   });
   

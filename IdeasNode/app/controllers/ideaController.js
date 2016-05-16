@@ -16,7 +16,7 @@ var Idea = require('../models/idea');
 var ideaController = {};
 
 
-ideaController.IDEA_QUERY_LIMIT = 3;
+ideaController.IDEA_QUERY_LIMIT = 2;
 ideaController.IDEA_QUERY_SORT_ORDER = {created: -1};
 
 ideaController.addIdea = function(userId, userSource, str, callback) {
@@ -33,7 +33,6 @@ ideaController.addIdea = function(userId, userSource, str, callback) {
 ideaController.find = function(userId, userSource, searchTxt, page, callback) {
   if (page == null)
     page = 0;
-  console.log('searchtxt is: ' + searchTxt);
   
   if (searchTxt != null && searchTxt != '') {
     Idea.find({$text: {$search: searchTxt}})

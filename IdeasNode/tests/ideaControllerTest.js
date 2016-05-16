@@ -1,8 +1,7 @@
 process.env.NODE_ENV = 'test';
 
 var should = require('chai').should(),
-    ideaController = require('../app/controllers/ideaController'),
-    testData = require('./testData');
+    ideaController = require('../app/controllers/ideaController');
 
 
 describe('ideaController', function() {
@@ -12,7 +11,7 @@ describe('ideaController', function() {
       var sender = 'testuser';
       var senderSource = 'development';
       var cb = function(err, ideas) {
-        ideas.should.have.lengthOf(3);
+        ideas.should.have.lengthOf(2);
         done();
       };
       ideaController.find(sender, senderSource, text, 0, cb);

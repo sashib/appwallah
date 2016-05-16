@@ -34,7 +34,6 @@ messageController.handleFind = function(sender, senderSource, text, page, cb) {
   var callback = function (err, ideas) {
     var ideasStr = "";
     var ideasShortStr = "";
-    console.log("ideas len is: " + ideas.length);
     if (!err) {
       if (ideas.length <= 0) {
         if (page > 0)

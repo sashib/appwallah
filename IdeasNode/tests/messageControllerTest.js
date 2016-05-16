@@ -4,14 +4,12 @@ var chai = require('chai'),
     sinon = require('sinon'),
     proxyquire = require('proxyquire'),
     messageHelper = require('../app/helpers/messageHelper'),
-    messageController = require('../app/controllers/messageController'),
-    Idea = require('../app/models/idea'),
-    testData = require('./testData');
+    messageController = require('../app/controllers/messageController');
 
 var expect = chai.expect;
 var should = chai.should();
 
-describe('messageController', function() {  
+describe('messageController', function() {    
   describe('handleHelp()', function() {
     it('should return help info if text is \'help\'', function(done) {
       var helpText = messageHelper.HELP;
@@ -36,9 +34,10 @@ describe('messageController', function() {
         done();
       });
     });
-    it('should return a list of results and payload to the callback if results are 3 or more', function(done) {
+    it('should return a list of results and payload to the callback if results are 2 or more', function(done) {
+      var exp = "some new #idea";
       messageController.handleFind(userId, userSource, 'find', 0, function(sender, text, payload) {
-        expect(text).to.contain(expected);
+        expect(text).to.contain(exp);
         expect(payload.sender).to.equal(userId);
         expect(payload.senderSource).to.equal(userSource);
         expect(payload.page).to.equal(1);
@@ -48,7 +47,7 @@ describe('messageController', function() {
 
     });
     it('should return a list of results with ... if total result str is more then ' + messageController.MAX_CHARS_PER_TEXT, function(done) {
-        var ellipsesExp = 'a fifth #amazing idea 12345678987654321123456789876543219999999999';
+        var ellipsesExp = 'some new #idea #test';
         messageController.handleFind(userId, userSource, 'find', 0, function(sender, text, payload) {
         expect(text).to.contain(ellipsesExp);
         done();

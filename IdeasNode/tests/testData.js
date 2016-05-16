@@ -16,21 +16,21 @@ module.exports.createIdeaCollection = function(done) {
 
 						 },
 						 {
-						   description: 'a third #grand new #awesome #idea 12345678987654321123456789876543219999999999',
+						   description: 'a third #grand new #awesome #idea 1234567898765432112345678987654321999999999912345678987654321123456789876543219999999999',
 						   userId: 'testuser',
 						   userSource: 'development',
 						   hashtags: ['#idea', '#grand', '#awesome']
 
 						 },
 						 {
-						   description: 'a fourth new #awesome #idea 12345678987654321123456789876543219999999999',
+						   description: 'a fourth new #awesome #idea 123456789876543211234567898765432199999999991234567898765432112345678987654321999999999912345678987654321123456789876543219999999999',
 						   userId: 'testuser',
 						   userSource: 'development',
 						   hashtags: ['#idea', '#awesome']
 
 						 },
 						 {
-						   description: 'a fifth #amazing idea 12345678987654321123456789876543219999999999',
+						   description: 'a fifth #amazing idea 12345678987654321123456789876543219999999999123456789876543211234567898765432199999999991234567898765432112345678987654321999999999912345678987654321123456789876543219999999999',
 						   userId: 'testuser',
 						   userSource: 'development',
 						   hashtags: ['#amazing']

@@ -33,17 +33,17 @@ describe('ideaController', function() {
       var sender = 'testuser';
       var senderSource = 'development';
       var cb = function(err, ideas) {
-        ideas.should.have.lengthOf(5);
+        ideas.should.have.lengthOf(ideaController.IDEA_QUERY_LIMIT);
         done();
       };
       ideaController.find(sender, senderSource, text, 0, cb);
     });
-    it('should return second page of 1 results', function(done) {
+    it('should return second page of 3 results', function(done) {
       var text = '';
       var sender = 'testuser';
       var senderSource = 'development';
       var cb = function(err, ideas) {
-        ideas.should.have.lengthOf(1);
+        ideas.should.have.lengthOf(ideaController.IDEA_QUERY_LIMIT);
         done();
       };
       ideaController.find(sender, senderSource, text, 1, cb);

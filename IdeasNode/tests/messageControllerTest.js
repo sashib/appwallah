@@ -36,13 +36,13 @@ describe('messageController', function() {
         done();
       });
     });
-    it('should return a list of results and payload to the callback if results are 5 or more', function(done) {
+    it('should return a list of results and payload to the callback if results are 3 or more', function(done) {
       messageController.handleFind(userId, userSource, 'find', 0, function(sender, text, payload) {
         expect(text).to.contain(expected);
         expect(payload.sender).to.equal(userId);
         expect(payload.senderSource).to.equal(userSource);
         expect(payload.page).to.equal(1);
-        expect(payload.searchText).to.equal(null);
+        expect(payload.searchText).to.equal('find');
         done();
       });
 
@@ -57,8 +57,9 @@ describe('messageController', function() {
     });
 
     it('should return a list of results and no payload to the callback if results are 5 or less', function(done) {
-        messageController.handleFind(userId, userSource, 'find awesome', 0, function(sender, text, payload) {
-        expect(text).to.contain(expected);
+        var exp = 'a fourth new #awesome #idea';
+        messageController.handleFind(userId, userSource, 'find fourth', 0, function(sender, text, payload) {
+        expect(text).to.contain(exp);
         expect(payload).to.equal(null);
         done();
       });

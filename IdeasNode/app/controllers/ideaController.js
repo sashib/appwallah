@@ -16,7 +16,7 @@ var Idea = require('../models/idea');
 var ideaController = {};
 
 
-ideaController.IDEA_QUERY_LIMIT = 5;
+ideaController.IDEA_QUERY_LIMIT = 3;
 ideaController.IDEA_QUERY_SORT_ORDER = {created: -1};
 
 ideaController.addIdea = function(userId, userSource, str, callback) {

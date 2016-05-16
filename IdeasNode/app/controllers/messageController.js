@@ -28,7 +28,7 @@ messageController.getPagingPayload = function(sender, senderSource, searchTxt, p
 
 messageController.handleFind = function(sender, senderSource, text, page, cb) {
   var searchText = messageHelper.getFindHashTag(text);
-  var payloadNext = messageController.getPagingPayload(sender, senderSource, searchText, page);
+  var payloadNext = messageController.getPagingPayload(sender, senderSource, text, page);
   var queryLimit = ideas.IDEA_QUERY_LIMIT;  
 
   var callback = function (err, ideas) {

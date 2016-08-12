@@ -27,6 +27,7 @@ console.log("NODE_ENV is: " + process.env.NODE_ENV);
 
 app.get('/webhook/', facebookController.handleWebhookGet);
 app.post('/webhook/', facebookController.handleWebhookPost);
+app.post('/kahunawebhook/', facebookController.handleSendCampaign);
 
 app.use(express.static('public'));
 app.get('/', function (req, res) {

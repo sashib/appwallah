@@ -1,0 +1,117 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kahuna</title>
+	<link href='https://fonts.googleapis.com/css?family=Lato:400,300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="kahuna.css">  
+  </head>
+  <body>
+    <div class="kahuna-cell" style="border-bottom:0px;">
+      <div style="padding-top:12px;">Push</div>
+      <div class="switch">
+        <div class="switch-handle" ><div style="padding-top:13px;"><svg version="1.1" x="0px" y="0px" width="5px" height="9px" viewBox="-303 392.9 1 9" ><g transform="translate(42.000000, 12.000000)" ><path fill="#9BA5B0" d="M-347,381.4v8v0.5h1v-0.5v-8v-0.5h-1V381.4z" ></path></g><g transform="translate(44.000000, 12.000000)" ><path fill="#9BA5B0" d="M-347,381.4v8v0.5h1v-0.5v-8v-0.5h-1V381.4z" ></path></g><g transform="translate(46.000000, 12.000000)" ><path fill="#9BA5B0" d="M-347,381.4v8v0.5h1v-0.5v-8v-0.5h-1V381.4z" ></path></g></svg></div></div>
+        <div class="switch-off" >OFF</div>
+      </div>
+    </div>
+    <div class="kahuna-cell" >
+      <div style="padding-top:12px;">Email</div>
+      <div class="switch">
+        <div class="switch-handle" ><div style="padding-top:13px;"><svg version="1.1" x="0px" y="0px" width="5px" height="9px" viewBox="-303 392.9 1 9" ><g transform="translate(42.000000, 12.000000)" ><path fill="#9BA5B0" d="M-347,381.4v8v0.5h1v-0.5v-8v-0.5h-1V381.4z" ></path></g><g transform="translate(44.000000, 12.000000)" ><path fill="#9BA5B0" d="M-347,381.4v8v0.5h1v-0.5v-8v-0.5h-1V381.4z" ></path></g><g transform="translate(46.000000, 12.000000)" ><path fill="#9BA5B0" d="M-347,381.4v8v0.5h1v-0.5v-8v-0.5h-1V381.4z" ></path></g></svg></div></div>
+        <div class="switch-off" >OFF</div>
+      </div>      
+    </div>
+    <div class="kahuna-cell" style="border-top:0px;">
+      <div style="padding-top:12px;">In-App</div>
+      <div class="switch">
+        <div class="switch-handle" ><div style="padding-top:13px;"><svg version="1.1" x="0px" y="0px" width="5px" height="9px" viewBox="-303 392.9 1 9" ><g transform="translate(42.000000, 12.000000)" ><path fill="#9BA5B0" d="M-347,381.4v8v0.5h1v-0.5v-8v-0.5h-1V381.4z" ></path></g><g transform="translate(44.000000, 12.000000)" ><path fill="#9BA5B0" d="M-347,381.4v8v0.5h1v-0.5v-8v-0.5h-1V381.4z" ></path></g><g transform="translate(46.000000, 12.000000)" ><path fill="#9BA5B0" d="M-347,381.4v8v0.5h1v-0.5v-8v-0.5h-1V381.4z" ></path></g></svg></div></div>
+        <div class="switch-off" >OFF</div>
+      </div>
+    </div>
+    <div id="kahuna-main">
+      <div id="kahuna-main-header">
+		    Facebook Messenger
+      </div>
+      <div id="msg-preview-title">
+        Configure your message
+      </div>
+      <div id="msg-preview-main">
+        <div id="msg-preview-input">
+            <input type="text" class="textfield" id="imgurl" placeholder="Image Url"><br>
+            <input type="text" class="textfield" id="title" name="title" placeholder="Title"><br>
+            <input type="text" class="textfield" id="subtitle" name="subtitle" placeholder="Subtitle"><br>
+            <input type="text" class="textfield" id="btnlabel1" placeholder="Button 1 Label"><br>
+            <input type="text" class="textfield" id="btnurl1" placeholder="Button 1 Url"><br>
+            <input type="text" class="textfield" id="btnlabel2" placeholder="Button 2 Label"><br>
+            <input type="text" class="textfield" id="btnurl2" placeholder="Button 2 Url"><br>
+            <div class="textfieldbutton" style="float:left;" onclick="onUpdate();"><div style="padding-top:10px;">Update</div></div>
+            <div class="textfieldbutton" style="margin-left:130px;" onclick="launchCampaign();"><div style="padding-top:10px;">Launch</div></div>
+
+        </div>
+        <div id="msg-preview-output">
+          <div id="msg-preview">
+            <div id="msg-preview-img">
+              <!--<div style="color:#666666; font-weight: 300; font-size: 12pt; text-align: center; margin:auto; width:100%; height:100%;" id="imageplaceholder">IMAGE</div>-->
+            </div>
+            <div id="previewtitle" class="previewlabel" style="font-weight: bold; margin-top:10px; color: #000000;">Title</div>
+            <div id="previewsubtitle" class="previewlabel" style="color:#888888;font-weight:300">Subtitle</div>
+            <div class="button" style="margin-top:20px">
+              <div style="padding-top:6px;"><a id="prevbtn1" href="">Button 1</a></div>
+            </div>
+            <div class="button">
+              <div style="padding-top:6px;"><a id="prevbtn2" href="">Button 2</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      var title, subtitle, btnlabel1, btnurl1, btnlabel2, btnurl2, imgurl;
+
+      //test user id
+      var userId = "1049745031763276";
+
+      function onUpdate() {
+
+
+        title = document.getElementById('title').value;
+        subtitle = document.getElementById('subtitle').value;
+        imgurl = document.getElementById('imgurl').value;
+        btnlabel1 = document.getElementById('btnlabel1').value;
+        btnlabel2 = document.getElementById('btnlabel2').value;
+        btnurl1 = document.getElementById('btnurl1').value;
+        btnurl2 = document.getElementById('btnurl2').value;
+
+        var img = document.getElementById('msg-preview-img');
+        img.style.background = "url('" + imgurl + "')";
+        img.style.backgroundRepeat = "no-repeat";
+        img.style.border = "none";
+        img.style.backgroundSize = "contain";
+        img.style.backgroundPosition = "center";
+        
+        document.getElementById('previewtitle').innerHTML = title;
+        document.getElementById('previewsubtitle').innerHTML = subtitle;
+        document.getElementById('prevbtn1').innerHTML = btnlabel1;
+        document.getElementById('prevbtn2').innerHTML = btnlabel2;
+        document.getElementById('prevbtn1').href = btnurl1;
+        document.getElementById('prevbtn2').href = btnurl2;
+
+      }
+
+      function launchCampaign() {
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+          if (xhttp.readyState == 4 && xhttp.status == 200) {
+            document.getElementById("demo").innerHTML = xhttp.responseText;
+          } 
+            document.getElementById("demo").innerHTML = xhttp.responseText;
+        };
+        xhttp.open("POST", "https://www.appwallah.com/kahunawebhook/", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send("userId="+userId+"&title="+title+"&subtitle="+subtitle+"&imgUrl="+imgurl+"&buttonTitle="+btnlabel1+"&buttonUrl="+btnurl1+"&buttonTitle2="+btnlabel2+"&buttonUrl2="+btnurl2);
+
+
+      }
+    </script>
+  </body>
+</html>

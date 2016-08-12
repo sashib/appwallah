@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=utf-8 />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starter-22</title>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.teal-pink.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/jquery.sidr/2.2.1/stylesheets/jquery.sidr.dark.min.css">
+    <link href="main.css" rel='stylesheet' type='text/css'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>  
+    <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
+    <script src="typeahead.js"></script>
+    <script src="handlebars-v4.0.5.js"></script>
+    <script src="notify.min.js"></script>
+
+    <script src="//cdn.jsdelivr.net/jquery.sidr/2.2.1/jquery.sidr.min.js"></script>
+  </head>
+  <body>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyCflQpOaO8-tj8gdMzCBbpB9QcG4Acup4I",
+        authDomain: "starter-22.firebaseapp.com",
+        databaseURL: "https://starter-22.firebaseio.com",
+        storageBucket: "starter-22.appspot.com",
+      };
+      firebase.initializeApp(config);
+    </script>
+    <script type="text/javascript">
+      var players, map, selectedPlayer1, selectedPlayer2, playersJson;
+
+      function initApp() {
+        console.log('initapp');
+        document.getElementById('add-btn').addEventListener('click', addPlayer, false);
+        document.getElementById('signin-btn').addEventListener('click', signIn, false);
+        document.getElementById('next-btn').addEventListener('click', nextVote, false);
+        //document.getElementById('signout').addEventListener('click', signOut, false);
+
+        isAuthenticated();
+
+      }
+
+      function isAuthenticated() {
+        console.log('isAuthenticated called');
+        firebase.auth().onAuthStateChanged(function(user) {
+          console.log('in auth state');
+          if (user) {
+            console.log('user found: ' + user.uid);
+            var isAnonymous = user.isAnonymous;
+            if (!isAnonymous) {
+              showLogout();              
+            } else {
+              hideSignOut();
+            }
+            hideSignIn();
+          } else {
+            console.log('user not found');
+            hideSignOut();
+            //signInAnonymous();
+          }
+          loadData();
+        });
+      }
+
+      function hideSignOut() {
+        document.getElementById('signout').style.display = "none";
+      }
+      function showLogout() {
+        document.getElementById('signout').style.display = "";
+      }
+
+      function signInAnonymous() {
+        console.log('signing in anonymous');
+        firebase.auth().signInAnonymously().catch(function(error) {
+          if (error) {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            console.log(errorMessage);
+            showSignIn();          
+          }
+        });        
+      }
+
+      function checkAnonymous(func) {
+        console.log('checking isAnonymous');
+        var user = firebase.auth().currentUser;
+        console.log(user);
+        if (!user) {
+          showSignIn();              
+        } else {
+          func();
+        }
+      }
+
+
+      function loadData() {
+        console.log('loaddata');
+        firebase.database().ref('nflplayers').once('value').then(function(snapshot) {
+          playersJson = snapshot.val();
+          console.log(playersJson);
+        });
+
+        $('#player1').typeahead({
+          highlight: true
+        },
+        {
+          name: 'nflplayers',
+          display: 'name',
+          source: sourceFunc,
+          update: updateFunc1,
+          templates: {
+            empty: [
+              '<div class="empty-message">',
+                'unable to find any players that match',
+              '</div>'
+            ].join('\n'),
+            suggestion: Handlebars.compile('<div><b>{{name}}</b>, {{position}} {{team}}</div>')
+          }
+        });
+
+        $('#player1').bind('typeahead:select', onSelectPlayer1);
+        $('#player1').bind('typeahead:autocomplete', onSelectPlayer1);
+        $('#player2').bind('typeahead:select', onSelectPlayer2);
+        $('#player2').bind('typeahead:autocomplete', onSelectPlayer2);
+
+        $('#player2').typeahead({
+          highlight: true
+        },
+        {
+          name: 'nflplayers',
+          display: 'name',
+          source: sourceFunc,
+          templates: {
+            empty: [
+              '<div class="empty-message">',
+                'unable to find any players that match',
+              '</div>'
+            ].join('\n'),
+            suggestion: Handlebars.compile('<div><b>{{name}}</b>, {{position}} {{team}}</div>')
+          }
+        });
+
+        loadVotes();
+
+      }
+
+      function showSignIn() {
+        console.log('show sign in safasdfsf');
+        document.getElementById('signin').style.display = "";
+        document.getElementById('vote').style.display = "none";
+        document.getElementById('add-comparison').style.display = "none";
+
+        /*
+        $('#vote').slideUp("fast","linear", null);
+        $('#add-comparison').slideUp("fast","linear", function() {
+          //document.getElementById('signin').style.display = "";
+          window.scrollTo(0, 0);
+          $('#signin').slideDown("fast","linear",null);
+        });
+        */
+      }
+
+      function hideSignIn() {
+        //$('#signin').slideUp;
+        document.getElementById('signin').style.display = "none";
+        document.getElementById('vote').style.display = "";
+        document.getElementById('add-comparison').style.display = "";
+        //$('#vote').slideDown();
+        //$('#add-comparison').slideDown();
+      }
+
+      function signIn() {
+        console.log('do signin');
+        var email = document.getElementById('email').value;
+        var pd = document.getElementById('password').value;
+        document.getElementById('signin-info').innerHTML = "";
+
+        firebase.auth().signInWithEmailAndPassword(email, pd).catch(function(error) {
+          if (error) {
+            console.log(error);
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            var msg = "";
+            document.getElementById('signin-info').style.display = "";
+            switch (error.code) {
+              case 'auth/user-not-found':
+                registerUser(email, pd);
+                break;
+              case 'auth/invalid-email':
+                msg = "Invalid email";
+                break;
+              case 'auth/wrong-password':
+                msg = "Incorrect password";
+                break;
+              case 'auth/user-disabled':
+                msg = "This user has been disabled";
+                break;
+              default:
+                msg = "Issue signing in";
+                break;
+  
+            }
+            document.getElementById('signin-info').innerHTML = msg;
+          } else {
+            document.getElementById('signin-info').style.display = "";
+            isAuthenticated();
+          }
+        });
+      }
+
+      function registerUser(email, pd) {
+        console.log('create user');
+        firebase.auth().createUserWithEmailAndPassword(email, pd).catch(function(error) {
+          if (error) {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            var msg = "";
+            document.getElementById('signin-info').style.display = "";
+            switch (error.code) {
+              case 'auth/email-already-in-use':
+                msg = "Email already in use";
+                break;
+              case 'auth/invalid-email':
+                msg = "Invalid email";
+                break;
+              case 'auth/operation-not-allowed':
+                msg = errorMessage;
+                break;
+              case 'auth/weak-password':
+                msg = errorMessage;
+                break;
+              default:
+                msg = "Issue signing up";
+                break;
+            }
+            document.getElementById('signin-info').innerHTML = msg;
+  
+          } else {
+            document.getElementById('signin-info').style.display = "";
+            isAuthenticated();
+          }
+
+        });
+
+      }
+
+      function signOut() {
+        console.log('signing out');
+        firebase.auth().signOut().then(function() {
+          // Sign-out successful.
+          //isAuthenticated();
+          //signInAnonymous();
+          console.log('sign out successful');
+        }, function(error) {
+          // An error happened.
+        });
+      }
+
+      function onSelectPlayer1(ev, suggestion) {
+        selectedPlayer1 = suggestion;
+      }
+
+      function onSelectPlayer2(ev, suggestion) {
+        selectedPlayer2 = suggestion;
+      }
+
+      function addPlayer() {
+        checkAnonymous(doAddPlayer);
+      }
+
+      function doAddPlayer() {
+
+        if (selectedPlayer1 == null || selectedPlayer2 == null) {
+          return;
+        }
+
+        firebase.database().ref('nflweek').once('value').then(function(snapshot) {
+          var week = snapshot.val();
+          var tree = "nflentries" + week;
+          var ftree = tree + "/" + selectedPlayer1.key + selectedPlayer2.key;
+          var rtree = tree + "/" + selectedPlayer2.key + selectedPlayer1.key;
+
+          console.log(ftree);
+          firebase.database().ref(ftree).once('value').then(function(snapshot) {
+            console.log(snapshot.val());
+            if (snapshot.val() == null) {
+              firebase.database().ref(rtree).once('value').then(function(snapshot2) {
+                if (snapshot2.val() != null) {
+                  console.log("already exists");
+                  return;
+                } else {
+                  saveEntry(week, ftree);
+                }
+              });
+            } else {
+              console.log("already exists");
+              return;
+            }
+
+          });
+        });
+      }
+
+      function saveEntry(week, tree) {
+
+        var user = firebase.auth().currentUser;
+        var userarr = [user.uid];
+        var entry = {
+          player1Key: selectedPlayer1.key,
+          player1Votes: 0,
+          player2Key: selectedPlayer2.key,
+          player2Votes: 0,
+          askers: userarr
+        };
+        console.log("week is: " + week);
+
+        var ref = firebase.database().ref(tree);
+        ref.update(entry);        
+
+        clearAddPlayerFields();
+
+        $("#add-btn").notify("Players added!",  { 
+          position: "right", 
+          arrowShow: false, 
+          className: "success",
+          gap: 10 });
+
+      }
+
+      function clearAddPlayerFields() {
+        document.getElementById('player1').value = "";
+        document.getElementById('player2').value = "";
+      }
+
+      function sourceFunc(q, process) {
+        players = [];
+
+        var substrRegex = new RegExp(q, 'i');
+
+        for (var key in playersJson) {
+          var p = playersJson[key];
+          var name = p.name;
+          if (substrRegex.test(name)) {
+            p.key = key;
+            players.push(p);
+          }
+        }
+        process(players);
+      }
+
+      function updateFunc1(item) {
+        selectedPlayer1 = map[item];
+        console.log(item);
+        return item;
+      }
+      function updateFunc2(item) {
+        selectedPlayer2 = map[item];
+        return item;
+      }
+
+      function nextVote() {
+        loadVotes();
+      }
+
+      function loadVotes() {
+        firebase.database().ref('nflweek').once('value').then(function(snapshot) {
+          var week = snapshot.val();
+          var tree = "nflentries" + week;
+
+          firebase.database().ref(tree).orderByKey().once('value').then(function(snapshot) {
+            console.log(snapshot.numChildren());
+            var num = Math.floor((Math.random() * snapshot.numChildren()));
+            console.log(num);
+            var i=0;
+            var data, key;
+            snapshot.forEach(function(childSnapshot) {
+                if (i == num) {
+                  data = childSnapshot.val();
+                  key = childSnapshot.key;
+                  return true;
+                }
+                i++;
+            });
+            console.log(data + " " + key);
+
+            populateVotes(week, key, data);
+
+          });
+        });
+      
+      }
+
+      function populateVotes(week, key, data) {
+        var p1key = data.player1Key;
+        var p1votes = data.player1Votes;
+        var p2key = data.player2Key;
+        var p2votes = data.player2Votes;
+
+        var totalvotes = p1votes + p2votes;
+        console.log(totalvotes);
+
+        var p1per = 0;
+        var p2per = 0;
+
+        if (totalvotes > 0) {
+          p1per = Math.round((p1votes / totalvotes) * 100);
+          p2per = Math.round((p2votes / totalvotes) * 100);
+        }
+
+        populateVote(week, key, p1key, p1per, "leftvote");
+        populateVote(week, key, p2key, p2per, "rightvote");
+
+      }
+
+      function populateVote(week, key, pkey, per, elemId) {
+        firebase.database().ref('nflplayers/' + pkey).once('value').then(function(snap) {
+            var p = snap.val();
+            var name = p.name;
+            var html = "<div style='font-size:14pt;padding-top:8px;margin-top:30px;'><b>" + p.name + "</b></div>" + p.position + ", " + p.team;
+            document.getElementById(elemId).innerHTML = html;
+            document.getElementById(elemId).addEventListener('click', function() {
+              updateVotes(week, key, pkey, elemId);
+            }, false);
+
+          });
+      }
+
+      function updateVotes(week, key, pkey, elemId) {
+        checkAnonymous(function() {
+          doUpdateVotes(week, key, pkey, elemId);
+        });
+      }
+
+      function doUpdateVotes(week, key, pkey, elemId) {
+        var path = 'nflentries' + week + '/' + key;
+
+        console.log(path + " " + pkey + " " + elemId);
+
+        var user = firebase.auth().currentUser;
+
+        var ref = firebase.database().ref(path);
+        ref.once('value').then(function(snap) {
+          var entry = snap.val();
+          var key = "";
+          if (entry) {
+
+            if (entry.player1Key == pkey) {
+              key = "player1Votes";
+            } else if (entry.player2Key == pkey) {
+              key = "player2Votes";
+            }
+
+            //check if voted already, if not update
+            if (entry.voters == null || entry.voters[user.uid] == null) {
+              var voters = {};
+              voters[user.uid] = true;
+              entry.voters = voters;
+              ref.update(entry);
+            } else if (entry.voters[user.uid] == true) {
+              console.log("already voted");
+              populateResults(true, entry);
+              return;
+            }
+
+            ref.child(key).transaction(function(val) {
+              console.log(val);
+              val++;
+              return val;
+            }, function(error, committed, newsnap) {
+              populateResults(false, newsnap.val());
+
+            });
+          }
+        });
+        
+    
+      }
+
+      function populateResults(alreadyVoted, entry) {
+        console.log("populating results");
+        console.log(entry);
+
+        if (alreadyVoted) {
+          $("#next-btn").notify("Already Voted!",  { 
+            position: "right", 
+            arrowShow: false, 
+            className: "success",
+            gap: 10 });
+        }
+        var p1votes = entry.player1Votes;
+        var p2votes = entry.player2Votes;
+        var total = p1votes + p2votes;
+        var p1per = Math.round((p1votes / total) * 100);
+        var p2per = Math.round((p2votes / total) * 100);
+
+        populateVoteResults(entry.player1Key, p1per, 'leftvote', (p1per > p2per));
+        populateVoteResults(entry.player2Key, p2per, 'rightvote', (p2per > p1per));
+
+      }
+
+      function populateVoteResults(key, per, elemId, highlight) {
+        firebase.database().ref('nflplayers/' + key).once('value').then(function(snap) {
+            var p = snap.val();
+            var name = p.name;
+            var bg = (highlight) ? "background-color: #00897b;" : "";
+            var html = "<div style='font-size:14pt;padding-top:20px;'><b>" + p.name + "</b></div>" + p.position + ", " + p.team + "<br/><div style='font-size:18pt;padding-top:20px;'>" + per + "%</div>";
+            document.getElementById(elemId).innerHTML = html;
+          });
+      }
+
+      window.onload = function() {
+        $('#simple-menu').sidr();
+        initApp();
+      };
+
+    </script>
+
+<div id="sidr">
+  <!-- Your content -->
+  <ul>
+    <li><a href="#">Profile</a></li>
+    <li class="active"><a href="#">My Asks</a></li>
+    <li><a href="#">My Votes</a></li>
+    <li id="signout"><a href="#" onclick="signOut();">Sign Out</a></li>
+  </ul>
+</div>
+
+    <div id="header-top" >
+
+      <div id="header">
+        <div id="simple-menu" href="#sidr" style="margin-left:10px;cursor: pointer;float:left;">
+          <div style="border-bottom: 1px solid #ffffff; width:20px; padding:3px;"></div>
+          <div style="border-bottom: 1px solid #ffffff; width:20px; padding:3px;"></div>
+          <div style="border-bottom: 1px solid #ffffff; width:20px; padding:3px;"></div>
+        </div>
+
+        <!--<div id="signout" style="float:right;margin-top:30px;margin-right:10px;display:none;"><a href="#" style="text-decoration:none;font-size:11pt;color:#ffffff;" >Sign Out</a></div>-->
+        <div id="title">
+          Starter-22
+        </div>
+
+      </div>
+    </div>
+
+  <!--    <div style="border-top: 1px solid #dcdcdc;max-width: 800px;min-width: 300px;margin:auto;margin-bottom: 20px;"></div>-->
+
+    <div id="main-content">
+
+      <div id="signin" style="display:none;" class="section">
+        <div class="content-header" style="color:#C62828;margin-bottom:10px;display: none;" id="signin-info"></div>
+        <div style="margin-top:15px;"><input class="input" type="text" id="email" name="email" placeholder="Email" /></div>
+        <div style="margin-top:15px;"><input class="input" type="password" id="password" name="password" placeholder="Password" /></div>
+        <div style="width:200px;margin-top:30px;"><button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="signin-btn">SIGN IN or SIGN UP</button></div>
+      </div>
+
+
+
+      <div id="add-comparison" class="section">
+        <div class="content-header" style="color: #009688">Ask</div>
+        <div style="padding-top:25px;"><input class="tt-hint" type="text" id="player1" name="player1" placeholder="Player 1" /></div>&nbsp;&nbsp;
+        <!--<span style="display:inline-block;padding-top: 10px;font-size: 10pt;color:#888888;">OR</span>-->
+        <div style="padding-top:5px;"><input class="tt-hint" type="text" id="player2" name="player2" placeholder="or Player 2" /></div>
+        <div style="width:215px;padding-top:30px;padding-bottom:50px;"><button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="add-btn" >WHO SHOULD I START?</button></div>
+      <div style="border-top: 1px solid #dcdcdc;max-width: 800px;margin:auto;margin-bottom: 20px;"></div>
+      </div>
+
+
+
+
+      <div id="vote" class="section">
+        <div class="content-header" style="color: #009688">Vote</div>
+        <div id="leftvote" class="votebox"></div>
+        <!--<span style="display:inline-block;padding-top: 60px;font-size: 10pt;color:#888888;text-align: center;width:10px">OR</span>-->
+        <div id="rightvote" class="votebox"></div>
+        <div class="voteitem"></div>
+        <div style="width:100px;margin-top:185px;margin-bottom:50px;"><button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="next-btn">NEXT</button></div>
+      <div style="border-top: 1px solid #dcdcdc;max-width: 800px;margin:auto;margin-bottom: 20px;"></div>
+      </div>
+
+
+    </div>
+
+
+
+  </body>
+</html>

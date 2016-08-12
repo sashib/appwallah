@@ -87,7 +87,7 @@ describe('Server', function() {
       fbContStub.sendTextMessage  = function(sender, text, payload) {
         console.log('sendmsgstub called: ' + sender);
         var reqObj = fbContStub.getReqObj(sender, text, payload);
-        console.log("payload: " + reqObj.json.message.attachment.payload.buttons[0].payload);
+        //console.log("payload: " + reqObj.json.message.attachment.payload.buttons[0].payload);
 
         sender.should.equal('testuser');
         payload.page.should.equal(1);

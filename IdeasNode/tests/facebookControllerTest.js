@@ -163,6 +163,126 @@ describe('facebook', function() {
       
       facebookCont.sendTextMessage(sender, text, payload);
 
+    });    
+  });
+  describe('handleSendCampaign', function() {
+    it('should return correct json', function(done) {
+      var req = {
+        body: {
+          title: "title 1",
+          subtitle: "subtitle 1",
+          imgUrl: "imgurl",
+          userId: "1234",
+          buttonTitle: "first button",
+          buttonUrl: "first url",
+          buttonTitle2: "second button",
+          buttonUrl2: "second url"
+        }
+      };
+      var res = { status:function(statusCode) {} };
+      var sendObj = { send:function(msg) {} };   
+
+      var resStatusSendStub = sinon.stub(sendObj, "send");
+      var resStatusStub = sinon.stub(res, "status", function(statusCode) {
+        return sendObj;
+      });
+      
+      
+      var expectedJson = {
+        "recipient":{
+          "id":"1234"
+        },
+        "message":{
+          "attachment":{
+            "type":"template",
+            "payload":{
+              "template_type":"generic",
+              "elements":[
+                {
+                  "title":"title 1",
+                  "image_url":"imgurl",
+                  "subtitle":"subtitle 1",
+                  "buttons":[
+                    {
+                      "type":"web_url",
+                      "url":"first url",
+                      "title":"first button"
+                    },
+                    {
+                      "type":"web_url",
+                      "url":"second url",
+                      "title":"second button"
+                    }              
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      };
+      var stub = sinon.stub(facebook, "sendCampaignMessage");
+
+      facebook.handleSendCampaign(req, res);
+
+      stub.calledWith(expectedJson).should.be.ok;
+      
+      resStatusStub.calledWith(200).should.be.ok;
+      resStatusSendStub.calledWith('Success').should.be.ok;
+
+      stub.restore();
+
+      done();
+
     });
-  })
+
+  });
+  describe('sendCampaignMessage()', function() {
+    it('should make a genericTemplate POST request', function(done) {
+      var jsonObj = {
+        "recipient":{
+          "id":"1234"
+        },
+        "message":{
+          "attachment":{
+            "type":"template",
+            "payload":{
+              "template_type":"generic",
+              "elements":[
+                {
+                  "title":"title 1",
+                  "image_url":"imgurl",
+                  "subtitle":"subtitle 1",
+                  "buttons":[
+                    {
+                      "type":"web_url",
+                      "url":"first url",
+                      "title":"first button"
+                    },
+                    {
+                      "type":"web_url",
+                      "url":"second url",
+                      "title":"second button"
+                    }              
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      };
+
+      var request = function(obj, cb) {
+        obj.url.should.equal(fbConfig.postUrl);
+        obj.method.should.equal("POST");
+        obj.qs.access_token.should.equal(fbConfig.pageToken);
+        obj.json.recipient.id.should.equal("1234");
+        obj.json.message.attachment.payload.elements[0].title.should.equal("title 1");
+        done();
+      };
+      var facebookCont = proxyquire('../app/controllers/facebookController', {'request':request});
+      
+      facebookCont.sendCampaignMessage(jsonObj);
+
+    });    
+  });
 });

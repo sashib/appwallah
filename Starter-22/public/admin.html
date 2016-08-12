@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Who Should I Start?</title>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.orange-indigo.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:300|Oswald:300' rel='stylesheet' type='text/css'>
+    <link href="admin.css" rel='stylesheet' type='text/css'>
+    <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
+  </head>
+  <body>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyCflQpOaO8-tj8gdMzCBbpB9QcG4Acup4I",
+        authDomain: "starter-22.firebaseapp.com",
+        databaseURL: "https://starter-22.firebaseio.com",
+        storageBucket: "starter-22.appspot.com",
+      };
+      firebase.initializeApp(config);
+    </script>
+    <script type="text/javascript">
+      function signIn() {
+        console.log('signin called');
+        var email = document.getElementById('email').value;
+        var password = document.getElementById('password').value;
+
+        firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          alert("Invalid login");
+        });
+      }
+
+      function loadData() {
+        firebase.database().ref('nflteams').once('value').then(function(snapshot) {
+          console.log(snapshot.val());
+          var p = snapshot.val();
+
+          var elem = document.getElementById("teams");
+          elem.innerHTML = ""; 
+          var html = elem.innerHTML;
+
+          html += "<div class='list'>"
+          html += "<div class='listitem' onclick='showPlayers()'>All</div>";
+          for (var key in p) {
+            html += "<div class='listitem' onclick='showPlayers(\"" + key + "\")'>" + key + "</div>";
+          }
+          console.log(html);
+          html += "</div>";
+          elem.innerHTML = html; 
+        });
+
+        showPlayers();
+
+      }
+
+      function onPlayerClick(key) {
+        firebase.database().ref('nflplayers/' + key).once('value').then(function(player) {
+          var val = player.val();
+          document.getElementById('id').value = key;
+          document.getElementById('name').value = val.name;
+          document.getElementById('team').value = val.team;
+          document.getElementById('position').value = val.position;
+          document.getElementById('wk1').value = val.week1;
+          document.getElementById('wk2').value = val.week2;
+          document.getElementById('wk3').value = val.week3;
+          document.getElementById('wk4').value = val.week4;
+          document.getElementById('wk5').value = val.week5;
+          document.getElementById('wk6').value = val.week6;
+          document.getElementById('wk7').value = val.week7;
+          document.getElementById('wk8').value = val.week8;
+          document.getElementById('wk9').value = val.week9;
+          document.getElementById('wk10').value = val.week10;
+          document.getElementById('wk11').value = val.week11;
+          document.getElementById('wk12').value = val.week12;
+          document.getElementById('wk13').value = val.week13;
+          document.getElementById('wk14').value = val.week14;
+          document.getElementById('wk15').value = val.week15;
+          document.getElementById('wk16').value = val.week16;
+          document.getElementById('wk17').value = val.week17;
+        });
+      }
+
+      function showPlayers(team) {
+        console.log(team);
+
+        var elem = document.getElementById('playerlist');
+        elem.innerHTML = ""; 
+        var list = elem.innerHTML;
+        list += "<table><tr><td>Name</td><td>Pos</td><td>Team</td><td>Wk1</td><td>Wk2</td><td>Wk3</td><td>Wk4</td><td>Wk5</td><td>Wk6</td><td>Wk7</td><td>Wk8</td><td>Wk9</td><td>Wk10</td><td>Wk11</td><td>Wk12</td><td>Wk13</td><td>Wk14</td><td>Wk15</td><td>Wk16</td><td>Wk17</td>";
+
+        var ref = firebase.database().ref('nflplayers');
+        if (team != null) {
+          ref = firebase.database().ref('nflplayers').orderByChild("team").equalTo(team);
+        }
+
+        ref.once('value').then(function(snapshot) {
+          console.log(snapshot.val());
+          var p = snapshot.val();
+          for (var key in p) {
+            list += "<tr class='listitem' onclick='onPlayerClick(\"" + key + "\")'><td>" + p[key].name  + "</td><td>" + p[key].position + "</td><td>" + p[key].team + "</td><td>" + p[key].week1 + "</td><td>" + p[key].week2 + "</td><td>" + p[key].week3 + "</td><td>" + p[key].week4 + "</td><td>" + p[key].week5 + "</td><td>" + p[key].week6 + "</td><td>" + p[key].week7 + "</td><td>" + p[key].week8 + "</td><td>" + p[key].week9 + "</td><td>" + p[key].week10 + "</td><td>" + p[key].week11 + "</td><td>" + p[key].week12 + "</td><td>" + p[key].week13 + "</td><td>" + p[key].week14 + "</td><td>" + p[key].week15 + "</td><td>" + p[key].week16 + "</td><td>" + p[key].week17 + "</td></tr>";
+          }
+          console.log(list);
+          list += "</table>"
+          elem.innerHTML = list;
+        });
+      }
+
+      function clearFields() {
+        document.getElementById('id').value = "";
+        document.getElementById('name').value = "";
+        document.getElementById('team').value = "";
+        document.getElementById('position').value = "";
+        document.getElementById('wk1').value = 0;
+        document.getElementById('wk2').value = 0;
+        document.getElementById('wk3').value = 0;
+        document.getElementById('wk4').value = 0;
+        document.getElementById('wk5').value = 0;
+        document.getElementById('wk6').value = 0;
+        document.getElementById('wk7').value = 0;
+        document.getElementById('wk8').value = 0;
+        document.getElementById('wk9').value = 0;
+        document.getElementById('wk10').value = 0;
+        document.getElementById('wk11').value = 0;
+        document.getElementById('wk12').value = 0;
+        document.getElementById('wk13').value = 0;
+        document.getElementById('wk14').value = 0;
+        document.getElementById('wk15').value = 0;
+        document.getElementById('wk16').value = 0;
+        document.getElementById('wk17').value = 0;
+      }
+
+      function addPlayer() {
+        var id = document.getElementById('id').value
+        var name = document.getElementById('name').value;
+        var team = document.getElementById('team').value;
+        var position = document.getElementById('position').value;
+        var wk1 = document.getElementById('wk1').value;
+        var wk2 = document.getElementById('wk2').value;
+        var wk3 = document.getElementById('wk3').value;
+        var wk4 = document.getElementById('wk4').value;
+        var wk5 = document.getElementById('wk5').value;
+        var wk6 = document.getElementById('wk6').value;
+        var wk7 = document.getElementById('wk7').value;
+        var wk8 = document.getElementById('wk8').value;
+        var wk9 = document.getElementById('wk9').value;
+        var wk10 = document.getElementById('wk10').value;
+        var wk11 = document.getElementById('wk11').value;
+        var wk12 = document.getElementById('wk12').value;
+        var wk13 = document.getElementById('wk13').value;
+        var wk14 = document.getElementById('wk14').value;
+        var wk15 = document.getElementById('wk15').value;
+        var wk16 = document.getElementById('wk16').value;
+        var wk17 = document.getElementById('wk17').value;
+
+        wk1 = wk1 == "undefined" ? 0 : wk1;
+        wk2 = wk2 == "undefined" ? 0 : wk2;
+        wk3 = wk3 == "undefined" ? 0 : wk3;
+        wk4 = wk4 == "undefined" ? 0 : wk4;
+        wk5 = wk5 == "undefined" ? 0 : wk5;
+        wk6 = wk6 == "undefined" ? 0 : wk6;
+        wk7 = wk7 == "undefined" ? 0 : wk7;
+        wk8 = wk8 == "undefined" ? 0 : wk8;
+        wk9 = wk9 == "undefined" ? 0 : wk9;
+        wk10 = wk10 == "undefined" ? 0 : wk10;
+        wk11 = wk11 == "undefined" ? 0 : wk11;
+        wk12 = wk12 == "undefined" ? 0 : wk12;
+        wk13 = wk13 == "undefined" ? 0 : wk13;
+        wk14 = wk14 == "undefined" ? 0 : wk14;
+        wk15 = wk15 == "undefined" ? 0 : wk15;
+        wk16 = wk16 == "undefined" ? 0 : wk16;
+        wk17 = wk17 == "undefined" ? 0 : wk17;
+
+        var player = {
+          name: name,
+          team: team,
+          position: position,
+          week1: wk1,
+          week2: wk2,
+          week3: wk3,
+          week4: wk4,
+          week5: wk5,
+          week6: wk6,
+          week7: wk7,
+          week8: wk8,
+          week9: wk9,
+          week10: wk10,
+          week11: wk11,
+          week12: wk12,
+          week13: wk13,
+          week14: wk14,
+          week15: wk15,
+          week16: wk16,
+          week17: wk17
+
+        };
+
+        
+        var playerRef;
+        if (id == null || id == "") {
+          var ref = firebase.database().ref('nflplayers');
+          playerRef = ref.push();
+        } else {
+          playerRef = firebase.database().ref('nflplayers/' + id);
+        }
+        playerRef.update(player);
+
+        showPlayers();
+        clearFields();
+
+      }
+
+      function initApp() {
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            document.getElementById('sign-in').style.display = "none";
+            document.getElementById('sign-out-btn').style.display = "block";
+            document.getElementById('content').style.display = "block";
+
+            loadData();
+          } else {
+            document.getElementById('sign-in').style.display = "block";
+            document.getElementById('content').style.display = "none";
+            document.getElementById('sign-out-btn').style.display = "none";
+          }
+        });
+
+        document.getElementById('sign-in-btn').addEventListener('click', signIn, false);
+        document.getElementById('add-player-btn').addEventListener('click', addPlayer, false);
+        document.getElementById('clear-player-btn').addEventListener('click', clearFields, false);
+      
+      }
+
+      window.onload = function() {
+        initApp();
+      };
+    </script>
+
+    <div id="header">
+      Admin
+    </div>
+    <div id="sign-in">
+      Sign In
+      <br/><br/>
+      <input style="display:inline;width:auto;" type="text" id="email" name="email" placeholder="Email"/>
+      <br/>
+      <input style="display:inline;width:auto;" type="password" id="password" name="password" placeholder="Password"/>
+      <br/><br/>
+      <button class="mdl-button mdl-js-button mdl-button--raised" id="sign-in-btn" name="signin">Sign In</button>          
+    </div>
+    <div id="content">
+      <button class="mdl-button mdl-js-button mdl-button--raised" style="margin-top: 30px;" id="sign-out-btn" name="signout">Sign Out</button>
+      <div id="teams">
+        <h4>Teams</h4>
+      </div>
+      <div id="players">
+        <div id="addplayer">
+          <input style="display:inline;width:auto;" type="text" id="id" name="id" placeholder="ID (leave blank)"/>
+          <input style="display:inline;width:auto;" type="text" id="name" name="name" placeholder="Name"/>
+          <input style="display:inline;width:auto;" type="text" id="position" name="position" placeholder="Position"/>
+          <input style="display:inline;width:auto;" type="text" id="team" name="team" placeholder="Team"/>
+          <input style="display:inline;width:auto;" type="text" id="wk1" name="wk1" placeholder="Week 1 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk2" name="wk2" placeholder="Week 2 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk3" name="wk3" placeholder="Week 3 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk4" name="wk4" placeholder="Week 4 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk5" name="wk5" placeholder="Week 5 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk6" name="wk6" placeholder="Week 6 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk7" name="wk7" placeholder="Week 7 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk8" name="wk8" placeholder="Week 8 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk9" name="wk9" placeholder="Week 9 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk10" name="wk10" placeholder="Week 10 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk11" name="wk11" placeholder="Week 11 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk12" name="wk12" placeholder="Week 12 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk13" name="wk13" placeholder="Week 13 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk14" name="wk14" placeholder="Week 14 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk15" name="wk15" placeholder="Week 15 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk16" name="wk16" placeholder="Week 16 FP"/>
+          <input style="display:inline;width:auto;" type="text" id="wk17" name="wk17" placeholder="Week 17 FP"/>
+
+          &nbsp;&nbsp;&nbsp;
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="add-player-btn" name="add-player-btn">Add</button>
+          &nbsp;&nbsp;&nbsp;
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="clear-player-btn" name="clear-player-btn">Clear</button>
+        </div>
+        <div id="playerlist" class="list">
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

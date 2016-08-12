@@ -6,6 +6,37 @@ var facebookController = {};
 
 /* TEXT SENT TO FB MUST BE 320 CHARS OR LESS */
 
+
+facebookController.getWebUrlButtonObj = function(title, url) {
+  var obj = {
+    type: "web_url",
+    url: url,
+    title: title
+  };
+  return obj;
+}
+
+facebookController.getPostbackButtonObj = function(title, payload) {
+  var obj = {
+    type:"postback",
+    title: title,
+    payload: JSON.stringify(payload)
+  };
+  return obj;
+}
+
+facebookController.getElementObj = function(title, subTitle, imgUrl, buttonsArr) {
+
+  var elementObj = {
+    title: title,
+    subtitle: subTitle,
+    image_url: imgUrl,
+    buttons: buttonsArr
+  };
+
+  return elementObj;
+}
+
 facebookController.buttonTemplatePagingJson = function(sender, text, payloadObj) {
   var json = {};
   json.recipient = { id:sender };
@@ -32,6 +63,24 @@ facebookController.buttonTemplatePagingJson = function(sender, text, payloadObj)
   return json;
 }
 
+facebookController.genericTemplateJson = function(senderId, elementsArr) {
+  var json = {};
+  json.recipient = { id:senderId };
+
+  var payload = {
+    template_type:"generic",
+    elements: elementsArr
+  };
+  var attachment = {
+    type:"template",
+    payload: payload
+  };
+
+  json.message = { attachment: attachment };
+
+  return json;
+}
+
 facebookController.messageJson = function(sender, text) {
   var json = {};
   json.recipient = { id: sender };
@@ -40,14 +89,7 @@ facebookController.messageJson = function(sender, text) {
   return json;
 }
 
-facebookController.getReqObj = function(sender, text, payload) {
-  var jsonObj;
-  if (payload == null) {
-    jsonObj = facebookController.messageJson(sender, text);
-  } else {
-    jsonObj = facebookController.buttonTemplatePagingJson(sender, text, payload);
-  }
-
+facebookController.getReqObj = function(jsonObj) {
   var reqObj = {
     url: facebookConfig.postUrl,
     qs: {access_token:facebookConfig.pageToken},
@@ -58,10 +100,32 @@ facebookController.getReqObj = function(sender, text, payload) {
   return reqObj
 }
 
+facebookController.sendCampaignMessage = function(jsonObj) {
+
+  console.log("in sendCampaignMessage, json: " + JSON.stringify(jsonObj));
+  var reqObj = facebookController.getReqObj(jsonObj);
+
+  request(reqObj, function(error, response, body) {
+    if (error) {
+      console.log('Error sending message: ', error);
+    } else if (response.body.error) {
+      console.log('Error: ', response.body.error);
+    }
+  });
+
+}
+
 facebookController.sendTextMessage = function(sender, text, payload) {
 
   console.log("in sendTextMessage, sender: " + sender + ", payload: " + JSON.stringify(payload));
-  var reqObj = facebookController.getReqObj(sender, text, payload);
+  var jsonObj;
+  if (payload == null) {
+    jsonObj = facebookController.messageJson(sender, text);
+  } else {
+    jsonObj = facebookController.buttonTemplatePagingJson(sender, text, payload);
+  }
+
+  var reqObj = facebookController.getReqObj(jsonObj);
 
   request(reqObj, function(error, response, body) {
     if (error) {
@@ -102,6 +166,33 @@ facebookController.handleWebhookPost = function (req, res) {
   facebookController.processMessage(req.body);
   res.status(200).send('Success');
 } 
+
+facebookController.handleSendCampaign = function(req, res) {
+  var userId = req.body.userId;
+  var title = req.body.title;
+  var subTitle = req.body.subtitle;
+  var imgUrl = req.body.imgUrl;
+  var buttonTitle = req.body.buttonTitle;
+  var buttonUrl = req.body.buttonUrl;
+  var buttonTitle2 = req.body.buttonTitle2;
+  var buttonUrl2 = req.body.buttonUrl2;
+
+  var buttonArr = [
+    facebookController.getWebUrlButtonObj(buttonTitle, buttonUrl),
+    facebookController.getWebUrlButtonObj(buttonTitle2, buttonUrl2)
+  ];
+
+  var elementsArr = [
+    facebookController.getElementObj(title, subTitle, imgUrl, buttonArr)
+  ];
+
+  var json = facebookController.genericTemplateJson(userId, elementsArr);
+
+  facebookController.sendCampaignMessage(json);
+
+  res.status(200).send("Success");
+  //return json;
+}
 
 module.exports = facebookController;
 

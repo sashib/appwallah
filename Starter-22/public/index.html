@@ -16,22 +16,15 @@
     <script src="notify.min.js"></script>
 
     <script src="//cdn.jsdelivr.net/jquery.sidr/2.2.1/jquery.sidr.min.js"></script>
+    <script src="init.js"></script>
   </head>
   <body>
-    <script>
-      // Initialize Firebase
-      var config = {
-        apiKey: "AIzaSyCflQpOaO8-tj8gdMzCBbpB9QcG4Acup4I",
-        authDomain: "starter-22.firebaseapp.com",
-        databaseURL: "https://starter-22.firebaseio.com",
-        storageBucket: "starter-22.appspot.com",
-      };
-      firebase.initializeApp(config);
-    </script>
     <script type="text/javascript">
       var players, map, selectedPlayer1, selectedPlayer2, playersJson;
       var lastShownVoteKey;
+      var nflWeek;
       var currLeftVoteObj, currRightVoteObj;
+      var byeWeekTeams = [];
 
       function initApp() {
         console.log('initapp');
@@ -64,8 +57,26 @@
             hideSignOut();
             //signInAnonymous();
           }
-          loadData();
+          onAuthenticate(user);
         });
+      }
+
+      function onAuthenticate(user) {
+        firebase.database().ref('nflweek').once('value').then(function(snapshot) {
+          nflWeek = snapshot.val();
+          loadData();
+          if (user == null) {
+            document.getElementById('my-votes').style.display = "none";
+            document.getElementById('my-asks').style.display = "none";
+          } else {
+            document.getElementById('my-asks').style.display = "";
+            document.getElementById('my-votes').style.display = "";
+            showMyAsks(nflWeek);
+            showMyVotes(nflWeek);
+
+          }
+        });
+
       }
 
       function hideSignOut() {
@@ -283,8 +294,10 @@
         firebase.database().ref('nflweek').once('value').then(function(snapshot) {
           var week = snapshot.val();
           var tree = "nflentries" + week;
-          var ftree = tree + "/" + selectedPlayer1.key + selectedPlayer2.key;
-          var rtree = tree + "/" + selectedPlayer2.key + selectedPlayer1.key;
+          var fkey = selectedPlayer1.key + selectedPlayer2.key;
+          var rkey = selectedPlayer2.key + selectedPlayer1.key;
+          var ftree = tree + "/" + fkey;
+          var rtree = tree + "/" + rkey;
 
           console.log(ftree);
           firebase.database().ref(ftree).once('value').then(function(snapshot) {
@@ -293,15 +306,15 @@
               firebase.database().ref(rtree).once('value').then(function(snapshot2) {
                 if (snapshot2.val() != null) {
                   console.log("already exists");
-                  addToExistingVote(week, rtree);
+                  addToExistingVote(week, rtree, rkey);
                   return;
                 } else {
-                  saveEntry(week, ftree);
+                  saveEntry(week, ftree, fkey);
                 }
               });
             } else {
               console.log("already exists");
-              addToExistingVote(week, ftree);
+              addToExistingVote(week, ftree, fkey);
               return;
             }
 
@@ -309,7 +322,7 @@
         });
       }
 
-      function addToExistingVote(week, tree) {
+      function addToExistingVote(week, tree, key) {
         var user = firebase.auth().currentUser;
         var ref = firebase.database().ref(tree);
         console.log("adding to existing");
@@ -317,19 +330,24 @@
         ref.once('value').then(function(snap) {
           var val = snap.val();
           val.askers[user.uid] = true;
+          ref.update(val, function(error) {
+            //update user asks
+            updateUserAsk(week, key, user.uid);            
+          });
 
-          ref.update(val);
         });
 
         confirmAddPlayer();
 
       }
 
-      function saveEntry(week, tree) {
+      function saveEntry(week, tree, key) {
         var user = firebase.auth().currentUser;
         var askers = {};
         askers[user.uid] = true;
-        var userarr = [user.uid];
+
+        var voters = {};
+
         var entry = {
           player1Key: selectedPlayer1.key,
           player1Votes: 0,
@@ -337,12 +355,27 @@
           player2Votes: 0
         };
         entry.askers = askers;
-        console.log("week is: " + week);
+        entry.voters = voters;
 
         var ref = firebase.database().ref(tree);
-        ref.update(entry);        
+        ref.update(entry, function(error) {
+          updateUserAsk(week, key, user.uid);
+        });        
 
         confirmAddPlayer();
+
+      }
+
+      function updateUserAsk(week, key, userid) {
+        var user = {};
+        user[key] = true;
+
+        var path = "nflaskers" + week + "/" + userid;
+
+        var ref = firebase.database().ref(path);
+        ref.update(user, function(error) {
+
+        });
 
       }
 
@@ -354,6 +387,8 @@
           arrowShow: false, 
           className: "success",
           gap: 10 });
+
+        //showMyAsks(nflWeek);
       }
 
       function clearAddPlayerFields() {
@@ -464,11 +499,11 @@
 
         populateVote(p1key, "leftvote");
         populateVote(p2key, "rightvote");
+        showVotes();
 
       }
 
       function populateVote(pkey, elemId) {
-        showVotes();
         firebase.database().ref('nflplayers/' + pkey).once('value').then(function(snap) {
             var p = snap.val();
             var name = p.name;
@@ -512,34 +547,45 @@
               k = "player2Votes";
             }
 
-            //check if voted already, if not update
             if (entry.voters == null) {
               var voters = {};
-              voters[user.uid] = true;
               entry.voters = voters;
-              ref.update(entry);
             } else if (entry.voters[user.uid] == true) {
               console.log("already voted");
               populateResults(true, path);
               return;
-            } else if (entry.voters[user.uid] == null) {
-              entry.voters[user.uid] = true;
-              ref.update(entry);              
-            }
+            } 
 
-            ref.child(k).transaction(function(val) {
-              console.log(val);
-              val++;
-              return val;
-            }, function(error, committed, newsnap) {
-              populateVoteData(path);
-              populateResults(false, path);
+            entry.voters[user.uid] = true;
+            ref.update(entry, function(error) {
+              if(!error) {
+                ref.child(k).transaction(function(val) {
+                  console.log(val);
+                  val++;
+                  return val;
+                }, function(error, committed, newsnap) {
+                  updateUserVote(week, key, user.uid);
+                  populateVoteData(path);
+                  populateResults(false, path);
 
-            });
+                });                
+              }
+            });              
+            
+
           }
         });
-        
-    
+      }
+
+      function updateUserVote(week, key, userid) {
+        var user = {};
+        user[key] = true;
+
+        var path = "nflvoters" + week + "/" + userid;
+
+        var ref = firebase.database().ref(path);
+        ref.update(user);
+
       }
 
       function populateResults(alreadyVoted, path) {
@@ -577,10 +623,97 @@
             var p = snap.val();
             var name = p.name;
             var bg = (highlight) ? "background-color: #00897b;" : "";
-            var html = "<div style='font-size:14pt;padding-top:20px;'><b>" + p.name + "</b></div>" + p.position + ", " + p.team + "<br/><div style='font-size:18pt;padding-top:20px;'>" + per + "%</div>";
+            var html = "<div style='font-size:14pt;padding-top:20px;'><b>" + p.name + "</b></div>" + p.position + ", " + p.team + "<br/><div style='font-size:14pt;padding-top:20px;'>" + per + "%</div>";
             document.getElementById(elemId).innerHTML = html;
           });
       }
+
+      function showMyAsks(week) {
+        var user = firebase.auth().currentUser;
+        var path = 'nflaskers' + week + "/" + user.uid;
+        console.log(path);
+        document.getElementById('my-asks-header').innerHTML = "My Asks - Week " + week;
+
+        document.getElementById('asks-table').innerHTML = "";
+        showEntries(week, path, "asks-table", "ask");
+
+      }
+
+      function toggleAsks() {
+        var disp = document.getElementById('asks-table').style.display;
+        if (disp == "none") {
+          document.getElementById('asks-table').style.display = "";
+          document.getElementById('asks-toggle').innerHTML = "Hide";
+        } else {
+          document.getElementById('asks-table').style.display = "none";
+          document.getElementById('asks-toggle').innerHTML = "Show";
+
+        }
+      }
+
+      function showMyVotes(week) {
+        var user = firebase.auth().currentUser;
+        var path = 'nflvoters' + week + "/" + user.uid;
+        console.log(path);
+        document.getElementById('my-votes-header').innerHTML = "My Votes - Week " + week;
+
+        document.getElementById('votes-table').innerHTML = "";
+        showEntries(week, path, "votes-table", "vote");
+
+      }
+
+      function toggleVotes() {
+        var disp = document.getElementById('votes-table').style.display;
+        if (disp == "none") {
+          document.getElementById('votes-table').style.display = "";
+          document.getElementById('votes-toggle').innerHTML = "Hide";
+        } else {
+          document.getElementById('votes-table').style.display = "none";
+          document.getElementById('votes-toggle').innerHTML = "Show";
+
+        }
+      }
+
+
+      function showEntries(week, path, elemid, elemkey) {
+        var ref = firebase.database().ref(path);
+        ref.on('value', function(snapshot) {
+          console.log(snapshot.val());
+          var html = "";//document.getElementById(elemid).innerHTML;
+          snapshot.forEach(function(childSnapshot) {
+
+            snap = childSnapshot;
+            data = snap.val();
+            key = snap.key;
+            firebase.database().ref('nflentries' + week + "/" + key).once('value').then(function(newsnap) {
+              var entry = newsnap.val();
+
+              var p1key = entry.player1Key;
+              var p2key = entry.player2Key;
+
+              var p1votes = entry.player1Votes;
+              var p2votes = entry.player2Votes;
+              var total = p1votes + p2votes;
+              var p1per = (total == 0) ? 0 : Math.round((p1votes / total) * 100);
+              var p2per = (total == 0) ? 0 : Math.round((p2votes / total) * 100);
+
+
+              var elemidLeft = "askleft-" + elemkey + "-" + newsnap.key;
+              var elemidRight = "askright-" + elemkey + "-" + newsnap.key;
+              var htmlleft = "<tr style='border-bottom:2px solid #dcdcdc;height:30px;'><td id=" + elemidLeft + " style='padding-bottom:10px;padding-right:25px;'></td>";
+              var htmlright = "<td id=" + elemidRight + " style='padding-bottom:10px;'></td></tr>";
+              html += htmlleft + htmlright;
+
+              document.getElementById(elemid).innerHTML = html;
+              populateVoteResults(p1key, p1per, elemidLeft);
+              populateVoteResults(p2key, p2per, elemidRight);
+            });
+          });
+        });
+
+        ref.change
+      }
+
 
       window.onload = function() {
         $('#simple-menu').sidr();
@@ -593,7 +726,7 @@
   <!-- Your content -->
   <ul>
     <li><a href="#">Profile</a></li>
-    <li class="active"><a href="#">My Asks</a></li>
+    <li id="myasks"><a href="#" onclick="showMyAsks(nflWeek);">My Asks</a></li>
     <li><a href="#">My Votes</a></li>
     <li id="signout"><a href="#" onclick="signOut();">Sign Out</a></li>
   </ul>
@@ -625,6 +758,7 @@
         <div id="about">Having starter trouble? Don't flip a coin, ask the Fantasy Community!</div>
         <div style="border-top: 1px solid #dcdcdc;max-width: 800px;margin:auto;margin-bottom: 20px;"></div>
       </div>
+
       <div id="signin" style="display:none;" class="section">
         <div class="content-header" style="color:#C62828;margin-bottom:10px;display: none;" id="signin-info"></div>
         <div style="margin-top:15px;"><input class="input" type="text" id="email" name="email" placeholder="Email" /></div>
@@ -632,6 +766,12 @@
         <div style="width:200px;margin-top:30px;"><button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="signin-btn">SIGN IN or SIGN UP</button></div>
       </div>
 
+      <div id="my-asks" class="section">
+        <div class="content-header" id="my-asks-header">My Asks</div>
+        <div id="asks-toggle" style="color:blue;cursor:pointer" onclick="toggleAsks();">Hide</div>
+        <table id="asks-table" class="table"></table>
+        <div class="separator" style="margin-top:60px;"></div>
+      </div>
 
       <div id="add-comparison" class="section">
         <div class="content-header">Ask</div>
@@ -647,7 +787,7 @@
 
       <div id="vote" class="section">
         <div class="content-header">Vote</div>        
-        <div class="content-sub-header">Help the community, vote like an expert, select the player you think is the better choice!</div>
+        <div class="content-sub-header">Help the community, provide your expert opinion and select the player you think is the better choice!</div>
         <div id="leftvote" class="votebox"></div>
         <div id="rightvote" class="votebox"></div>
         <div id="votedata"></div>
@@ -657,10 +797,18 @@
 
       <div id="no-vote" class="section" style="display: none;">
         <div class="content-header" style="color: #009688;">Vote</div>        
-        <div class="content-sub-header">You've already voted on everything!</div>
+        <div class="content-sub-header">There's nothing left to vote!</div>
         <div style="width:200px;margin-top:70px;margin-bottom:55px;"><button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="my-votes-btn">SEE MY VOTES</button></div>
         <div class="separator"></div>
       </div>
+
+      <div id="my-votes" class="section">
+        <div class="content-header" id="my-votes-header">My Votes</div>
+        <div id="votes-toggle" style="color:blue;cursor:pointer" onclick="toggleVotes();">Hide</div>
+        <table id="votes-table" class="table"></table>
+        <div class="separator" style="margin-top:60px;"></div>
+      </div>
+
 
     </div>
 

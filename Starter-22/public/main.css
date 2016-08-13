@@ -72,6 +72,17 @@ body {
 	min-width: 300px;
 }
 
+#my-asks {
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
+.table {
+	background-color: #f8f8f8;
+	border: 1px solid #dcdcdc;
+	margin-top: 15px;
+	padding: 10px;
+}
 #add-comparison {
 	padding-top: 15px;
 	padding-bottom:15px;

@@ -1,5 +1,6 @@
 
 body {
+	font-family: "RobotoDraft","Roboto",sans-serif;
 }
 #header-top {
 	background-color: #00897b;
@@ -15,7 +16,6 @@ body {
 
 }
 #title {
-	font-family: "RobotoDraft","Roboto",sans-serif;
 	font-size: 24pt;
 	text-align: left;
 	margin-top:3px;
@@ -43,11 +43,27 @@ body {
 	
 }
 
+#about {
+	font-size: 12pt;
+	color:#444444;
+	padding-bottom: 50px;
+	line-height: 1.5em;
+	padding-top: 25px;	
+}
+
 .content-header {
 	font-size: 20pt;
 	color:#444444;
 	padding-bottom: 15px;
 	padding-top: 15px;
+	color: #009688;
+}
+
+.content-sub-header {
+	padding-top:15px;
+	padding-bottom:15px;
+	font-size:12pt;
+	color: #444444;
 }
 
 .section {
@@ -57,7 +73,8 @@ body {
 }
 
 #add-comparison {
-	padding-bottom:10px;
+	padding-top: 15px;
+	padding-bottom:15px;
 }
 #add-comparison .empty-message {
   padding: 5px 10px;
@@ -67,6 +84,14 @@ body {
 .suggestions {
 	border: 1px solid #dcdcdc;
 	background-color: #efefef;
+}
+
+.separator {
+	border-top: 1px solid #dcdcdc;
+	max-width: 800px;
+	margin:auto;
+	margin-bottom: 20px;
+	margin-top: 10px;
 }
 
 #leftvote {
@@ -80,6 +105,17 @@ body {
 	margin-top:25px;
 }
 #vote {
+	padding-top:10px;
+	padding-bottom: 10px;
+}
+#votedata {
+	margin-top:170px;
+	font-size: 12pt;
+	padding: 10px;
+	background-color: #f8f8f8;
+	border: 1px solid #dcdcdc;
+	text-align: center;
+
 }
 .votebox {
 	border: 2px solid #dcdcdc;

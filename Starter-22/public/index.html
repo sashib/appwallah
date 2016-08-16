@@ -14,7 +14,6 @@
     <script src="typeahead.js"></script>
     <script src="handlebars-v4.0.5.js"></script>
     <script src="notify.min.js"></script>
-
     <script src="//cdn.jsdelivr.net/jquery.sidr/2.2.1/jquery.sidr.min.js"></script>
     <script src="init.js"></script>
   </head>
@@ -68,9 +67,11 @@
           if (user == null) {
             document.getElementById('my-votes').style.display = "none";
             document.getElementById('my-asks').style.display = "none";
+            document.getElementById('intro').style.display = "";
           } else {
             document.getElementById('my-asks').style.display = "";
             document.getElementById('my-votes').style.display = "";
+            document.getElementById('intro').style.display = "none";
             showMyAsks(nflWeek);
             showMyVotes(nflWeek);
 
@@ -162,8 +163,8 @@
       }
 
       function showSignIn() {
-        console.log('show sign in safasdfsf');
         document.getElementById('signin').style.display = "";
+        document.getElementById('intro').style.display = "none";
         document.getElementById('vote').style.display = "none";
         document.getElementById('add-comparison').style.display = "none";
 
@@ -180,6 +181,7 @@
       function hideSignIn() {
         //$('#signin').slideUp;
         document.getElementById('signin').style.display = "none";
+        document.getElementById('intro').style.display = "";
         document.getElementById('vote').style.display = "";
         document.getElementById('add-comparison').style.display = "";
         //$('#vote').slideDown();
@@ -343,10 +345,9 @@
 
       function saveEntry(week, tree, key) {
         var user = firebase.auth().currentUser;
+        
         var askers = {};
         askers[user.uid] = true;
-
-        var voters = {};
 
         var entry = {
           player1Key: selectedPlayer1.key,
@@ -355,7 +356,8 @@
           player2Votes: 0
         };
         entry.askers = askers;
-        entry.voters = voters;
+        entry.player1Voters = {};
+        entry.player2Voters = {};
 
         var ref = firebase.database().ref(tree);
         ref.update(entry, function(error) {
@@ -435,10 +437,14 @@
           firebase.database().ref(tree).orderByKey().once('value').then(function(snapshot) {
             var data, key, snap;
             var found = snapshot.forEach(function(childSnapshot) {
-              snap = childSnapshot;
-              data = snap.val();
-              key = snap.key;
-              if ((data.voters == null || !data.voters[user.uid]) && lastShownVoteKey != key) {
+              data = childSnapshot.val();
+              key = childSnapshot.key;
+
+              if (user == null) {
+                return true;
+              }
+
+              if ((data.player1Voters == null || !data.player1Voters[user.uid]) && (data.player2Voters == null || !data.player2Voters[user.uid]) &&lastShownVoteKey != key) {
                 return true;
               }
               return false;
@@ -541,22 +547,26 @@
           var k = "";
           if (entry) {
 
+            if (entry.player1Voters == null) {
+              entry.player1Voters = {};
+            }
+            if (entry.player2Voters == null) {
+              entry.player2Voters = {};
+            }
+            if (entry.player2Voters[user.uid] == true || entry.player1Voters[user.uid] == true) {
+                console.log("already voted for a player");
+                populateResults(true, path);
+                return;
+            }   
+
             if (entry.player1Key == pkey) {
               k = "player1Votes";
+              entry.player1Voters[user.uid] = true;
             } else if (entry.player2Key == pkey) {
               k = "player2Votes";
+              entry.player2Voters[user.uid] = true;
             }
 
-            if (entry.voters == null) {
-              var voters = {};
-              entry.voters = voters;
-            } else if (entry.voters[user.uid] == true) {
-              console.log("already voted");
-              populateResults(true, path);
-              return;
-            } 
-
-            entry.voters[user.uid] = true;
             ref.update(entry, function(error) {
               if(!error) {
                 ref.child(k).transaction(function(val) {
@@ -588,6 +598,10 @@
 
       }
 
+      function getPer(votes, total) {
+        return (total == 0) ? 0 : Math.round((votes / total) * 100)
+      }
+
       function populateResults(alreadyVoted, path) {
 
         var ref = firebase.database().ref(path);
@@ -607,8 +621,9 @@
           var p1votes = entry.player1Votes;
           var p2votes = entry.player2Votes;
           var total = p1votes + p2votes;
-          var p1per = Math.round((p1votes / total) * 100);
-          var p2per = Math.round((p2votes / total) * 100);
+
+          var p1per = getPer(p1votes, total);
+          var p2per = getPer(p2votes, total);
 
           console.log(entry.player1Key + " votes: " + p1votes);
           console.log(entry.player2Key + " votes: " + p2votes);
@@ -676,6 +691,7 @@
 
 
       function showEntries(week, path, elemid, elemkey) {
+        var user = firebase.auth().currentUser;
         var ref = firebase.database().ref(path);
         ref.on('value', function(snapshot) {
           console.log(snapshot.val());
@@ -687,6 +703,7 @@
             key = snap.key;
             firebase.database().ref('nflentries' + week + "/" + key).once('value').then(function(newsnap) {
               var entry = newsnap.val();
+              console.log(entry);
 
               var p1key = entry.player1Key;
               var p2key = entry.player2Key;
@@ -694,27 +711,47 @@
               var p1votes = entry.player1Votes;
               var p2votes = entry.player2Votes;
               var total = p1votes + p2votes;
-              var p1per = (total == 0) ? 0 : Math.round((p1votes / total) * 100);
-              var p2per = (total == 0) ? 0 : Math.round((p2votes / total) * 100);
+              var p1per = getPer(p1votes, total);
+              var p2per = getPer(p2votes, total);
 
+              var highlightP1 = false;
+              var highlightP2 = false;
+              if (elemkey == "vote") {
+                if (entry.player1Voters != null && entry.player1Voters[user.uid]) {
+                  highlightP1 = true;
+                }
+                if (entry.player2Voters != null && entry.player2Voters[user.uid]) {
+                  highlightP2 = true;
+                }                
+              } else if (elemkey == "ask") {
+                highlightP1 = p1per > p2per;
+                highlightP2 = p2per > p1per;
+              }
 
               var elemidLeft = "askleft-" + elemkey + "-" + newsnap.key;
               var elemidRight = "askright-" + elemkey + "-" + newsnap.key;
-              var htmlleft = "<tr style='border-bottom:2px solid #dcdcdc;height:30px;'><td id=" + elemidLeft + " style='padding-bottom:10px;padding-right:25px;'></td>";
+              var htmlleft = "<tr><td id=" + elemidLeft + " style='padding-bottom:10px;padding-right:45px;'></td>";
               var htmlright = "<td id=" + elemidRight + " style='padding-bottom:10px;'></td></tr>";
               html += htmlleft + htmlright;
 
               document.getElementById(elemid).innerHTML = html;
-              populateVoteResults(p1key, p1per, elemidLeft);
-              populateVoteResults(p2key, p2per, elemidRight);
+              populateEntries(p1key, p1per, elemidLeft, elemkey, highlightP1);
+              populateEntries(p2key, p2per, elemidRight, elemkey, highlightP2);
             });
           });
         });
-
-        ref.change
       }
 
-
+      function populateEntries(key, per, elemId, elemkey, highlight) {
+        firebase.database().ref('nflplayers/' + key).once('value').then(function(snap) {
+            var p = snap.val();
+            var name = p.name;
+            var color = (elemkey == "vote") ? "color: #00897b;" : "color: #000000;font-weight:strong;";
+            var bg = (highlight) ? color + "font-size:16pt;" : "";
+            var html = "<div style='font-size:12pt;padding-top:20px;" + bg + "'><b>" + p.name + "</b></div>" + p.position + ", " + p.team + "<br/><div style='font-size:12pt;padding-top:20px;padding-bottom:20px;border-bottom: 1px solid #dcdcdc;'>" + per + "%</div>";
+            document.getElementById(elemId).innerHTML = html;
+          });
+      }
       window.onload = function() {
         $('#simple-menu').sidr();
         initApp();
@@ -753,24 +790,17 @@
 
     <div id="main-content">
       
-      <div class="section" style="padding-top:20px;">
-        <div class="content-header">Fantasy Football</div>
-        <div id="about">Having starter trouble? Don't flip a coin, ask the Fantasy Community!</div>
-        <div style="border-top: 1px solid #dcdcdc;max-width: 800px;margin:auto;margin-bottom: 20px;"></div>
-      </div>
-
       <div id="signin" style="display:none;" class="section">
         <div class="content-header" style="color:#C62828;margin-bottom:10px;display: none;" id="signin-info"></div>
-        <div style="margin-top:15px;"><input class="input" type="text" id="email" name="email" placeholder="Email" /></div>
+        <div style="margin-top:15px;"><input class="input" type="email" id="email" name="email" placeholder="Email" /></div>
         <div style="margin-top:15px;"><input class="input" type="password" id="password" name="password" placeholder="Password" /></div>
         <div style="width:200px;margin-top:30px;"><button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="signin-btn">SIGN IN or SIGN UP</button></div>
       </div>
 
-      <div id="my-asks" class="section">
-        <div class="content-header" id="my-asks-header">My Asks</div>
-        <div id="asks-toggle" style="color:blue;cursor:pointer" onclick="toggleAsks();">Hide</div>
-        <table id="asks-table" class="table"></table>
-        <div class="separator" style="margin-top:60px;"></div>
+      <div id="intro" class="section" style="padding-top:20px;">
+        <div class="content-header">Fantasy Football</div>
+        <div id="about">Having starter trouble? Don't flip a coin, ask the Fantasy Community!</div>
+        <div style="border-top: 1px solid #dcdcdc;max-width: 800px;margin:auto;margin-bottom: 20px;"></div>
       </div>
 
       <div id="add-comparison" class="section">
@@ -782,8 +812,6 @@
         <div style="width:215px;padding-top:45px;padding-bottom:50px;"><button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="add-btn" >WHO SHOULD I START?</button></div>
         <div class="separator"></div>
       </div>
-
-
 
       <div id="vote" class="section">
         <div class="content-header">Vote</div>        
@@ -801,6 +829,15 @@
         <div style="width:200px;margin-top:70px;margin-bottom:55px;"><button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="my-votes-btn">SEE MY VOTES</button></div>
         <div class="separator"></div>
       </div>
+
+
+      <div id="my-asks" class="section">
+        <div class="content-header" id="my-asks-header">My Asks</div>
+        <div id="asks-toggle" style="color:blue;cursor:pointer" onclick="toggleAsks();">Hide</div>
+        <table id="asks-table" class="table"></table>
+        <div class="separator" style="margin-top:60px;"></div>
+      </div>
+
 
       <div id="my-votes" class="section">
         <div class="content-header" id="my-votes-header">My Votes</div>

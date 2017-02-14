@@ -39,7 +39,7 @@ public class NewIdeaActivity extends BaseActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         mBodyField = (EditText) findViewById(R.id.field_body);
-        mSubmitButton = (FloatingActionButton) findViewById(R.id.fab_submit_post);
+        mSubmitButton = (FloatingActionButton) findViewById(R.id.fab_submit_idea);
 
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override

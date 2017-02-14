@@ -52,8 +52,19 @@ public class MainActivity extends BaseActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mPagerAdapter);
 
+        /*
         mNewIdea = (ImageView) findViewById(R.id.new_idea_btn);
         mNewIdea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, NewIdeaActivity.class);
+                startActivity(intent);
+            }
+        });
+        */
+
+        // Button launches NewPostActivity
+        findViewById(R.id.fab_new_idea).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, NewIdeaActivity.class);

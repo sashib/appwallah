@@ -12,6 +12,9 @@ import android.widget.TextView;
 import com.appwallah.ideawallah.R;
 import com.appwallah.ideawallah.models.Idea;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class IdeaViewHolder extends RecyclerView.ViewHolder {
 
@@ -30,7 +33,16 @@ public class IdeaViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindToIdea(Idea idea, View.OnClickListener starClickListener) {
-        authorView.setText(idea.author);
+
+        String author = idea.author;
+
+        if (idea.timestamp != 0) {
+            Date dt = new Date(idea.timestamp);
+            SimpleDateFormat format = new SimpleDateFormat("d MMM");
+            author += " - " + format.format(dt);
+        }
+
+        authorView.setText(author);
         numStarsView.setText(String.valueOf(idea.starCount));
         bodyView.setText(idea.body);
 

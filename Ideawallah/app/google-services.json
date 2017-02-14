@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "14039170492",
+    "firebase_url": "https://ideawallah.firebaseio.com",
+    "project_id": "ideawallah",
+    "storage_bucket": "ideawallah.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:14039170492:android:1184ff73d4f467f2",
+        "android_client_info": {
+          "package_name": "com.appwallah.ideawallah"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "14039170492-1rl6taq6ld5mb3195vvul7mfrd73cq5m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATpmE54A9PrXUvlxaw6SuKAXw9ItuLl10"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

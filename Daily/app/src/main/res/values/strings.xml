@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Daily</string>
+    <string name="selfie">Selfie</string>
+    <string name="food">Food</string>
+    <string name="inspiration">Inspiration</string>
+    <string name="note">What\'s on your mind?</string>
+</resources>

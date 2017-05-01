@@ -110,12 +110,13 @@ public class NewIdeaActivity extends BaseActivity {
     }
 
     private void writeNewIdea(String userId, String username, String body) {
-        String key = mDatabase.child("ideas").push().getKey();
+        String ideasPath = "/user-ideas/" + userId;
+        String key = mDatabase.child(ideasPath).push().getKey();
         Idea idea = new Idea(userId, username, false, body);
         Map<String, Object> ideaValues = idea.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/user-ideas/" + userId + "/" + key, ideaValues);
+        childUpdates.put(ideasPath + "/" + key, ideaValues);
 
         ArrayList<String> tags = Utils.getHashTags(body);
         for (String tag : tags) {

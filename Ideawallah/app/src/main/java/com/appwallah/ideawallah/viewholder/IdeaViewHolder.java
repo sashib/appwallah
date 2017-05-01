@@ -27,25 +27,28 @@ public class IdeaViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
 
         authorView = (TextView) itemView.findViewById(R.id.idea_author);
-        starView = (ImageView) itemView.findViewById(R.id.star);
-        numStarsView = (TextView) itemView.findViewById(R.id.idea_num_stars);
+        //starView = (ImageView) itemView.findViewById(R.id.star);
+        //numStarsView = (TextView) itemView.findViewById(R.id.idea_num_stars);
         bodyView = (TextView) itemView.findViewById(R.id.idea_body);
     }
 
     public void bindToIdea(Idea idea, View.OnClickListener starClickListener) {
 
-        String author = idea.author;
+        String author = "";// = idea.author;
 
         if (idea.timestamp != 0) {
             Date dt = new Date(idea.timestamp);
             SimpleDateFormat format = new SimpleDateFormat("d MMM");
-            author += " - " + format.format(dt);
+            //author += " - " + format.format(dt);
+            author = format.format(dt);
         }
 
         authorView.setText(author);
-        numStarsView.setText(String.valueOf(idea.starCount));
+        //numStarsView.setText(String.valueOf(idea.starCount));
+        //numStarsView.setVisibility(View.GONE);
+
         bodyView.setText(idea.body);
 
-        starView.setOnClickListener(starClickListener);
+        //starView.setOnClickListener(starClickListener);
     }
 }

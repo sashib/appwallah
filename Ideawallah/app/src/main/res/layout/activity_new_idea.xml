@@ -16,7 +16,7 @@
         android:layout_marginTop="5dp"
         android:hint="Write your idea..."
         android:inputType="textMultiLine"
-        android:maxLines="10"
+        android:lines="5"
         android:scrollHorizontally="false" />
 
     <android.support.design.widget.FloatingActionButton
@@ -26,6 +26,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_margin="16dp"
-        android:src="@android:drawable/ic_menu_send"/>
+        android:src="@drawable/ic_check"/>
 
 </RelativeLayout>

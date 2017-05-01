@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true" />
 
+        <!--
         <LinearLayout
             android:id="@+id/star_layout"
             android:layout_width="wrap_content"
@@ -44,13 +45,13 @@
                 tools:text="7" />
 
         </LinearLayout>
+        -->
 
         <include layout="@layout/include_idea_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/idea_author_layout"
-            android:layout_marginLeft="5dp"
             android:layout_marginTop="10dp" />
 
     </RelativeLayout>

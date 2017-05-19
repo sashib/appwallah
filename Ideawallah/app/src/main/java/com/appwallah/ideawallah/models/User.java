@@ -1,20 +1,29 @@
 package com.appwallah.ideawallah.models;
 
-import com.google.firebase.database.IgnoreExtraProperties;
 
-@IgnoreExtraProperties
 public class User {
 
-    public String username;
+
+    public String name;
     public String email;
+    public String date;
+    public String userId;
 
-    public User() {
-        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+    public String getName() {
+        return name;
     }
 
-    public User(String username, String email) {
-        this.username = username;
-        this.email = email;
+    public String getEmail() {
+        return email;
     }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
 
 }

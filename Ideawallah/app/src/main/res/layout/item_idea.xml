@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp">
 
+        <!--
         <include
             android:id="@+id/idea_author_layout"
             layout="@layout/include_idea_author"
@@ -17,7 +18,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true" />
 
-        <!--
         <LinearLayout
             android:id="@+id/star_layout"
             android:layout_width="wrap_content"
@@ -51,7 +51,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/idea_author_layout"
             android:layout_marginTop="10dp" />
 
     </RelativeLayout>

@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.appwallah.ideawallah.fragment.IdeaListFragment;
 import com.appwallah.ideawallah.fragment.MyIdeasFragment;
 
 public class MainActivity extends BaseActivity {
@@ -30,7 +31,7 @@ public class MainActivity extends BaseActivity {
         // Create the adapter that will return a fragment for each section
         mPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             private final Fragment[] mFragments = new Fragment[] {
-                    new MyIdeasFragment()
+                    new IdeaListFragment()
             };
             private final String[] mFragmentNames = new String[] {
                     getString(R.string.heading_my_ideas)
@@ -68,9 +69,23 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, NewIdeaActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        Log.d(TAG, "reqcode: " + requestCode + ", result: " + resultCode);
+        // Check which request we're responding to
+        if (requestCode == 1) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+
+                ((IdeaListFragment)mPagerAdapter.getItem(0)).loadIdeas();
+            }
+        }
     }
 
     public void logout() {

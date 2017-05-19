@@ -1,5 +1,6 @@
 package com.appwallah.ideawallah;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -8,6 +9,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.support.design.widget.FloatingActionButton;
 
+import com.appwallah.ideawallah.api.IdeawallahApiService;
+import com.appwallah.ideawallah.api.IdeawallahApiServiceInterface;
 import com.appwallah.ideawallah.models.Idea;
 import com.appwallah.ideawallah.models.User;
 import com.google.firebase.database.DataSnapshot;
@@ -21,12 +24,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class NewIdeaActivity extends BaseActivity {
 
     private static final String TAG = NewIdeaActivity.class.getName();
     private static final String REQUIRED = "Required";
-
-    private DatabaseReference mDatabase;
 
     private EditText mBodyField;
     private FloatingActionButton mSubmitButton;
@@ -35,8 +40,6 @@ public class NewIdeaActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_idea);
-
-        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         mBodyField = (EditText) findViewById(R.id.field_body);
         mSubmitButton = (FloatingActionButton) findViewById(R.id.fab_submit_idea);
@@ -60,44 +63,40 @@ public class NewIdeaActivity extends BaseActivity {
 
         // Disable button so there are no multi-posts
         setEditingEnabled(false);
-        Toast.makeText(this, "Saving...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Saving a great idea...", Toast.LENGTH_SHORT).show();
 
-        // [START single_value_read]
-        final String userId = getUid();
-        mDatabase.child("users").child(userId).addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        // Get user value
-                        User user = dataSnapshot.getValue(User.class);
+        Idea idea = new Idea();
+        idea.idea = body;
+        idea.global = false;
+        IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
+        Call<Idea> call = apiService.createIdea(Utils.getToken(getBaseContext()), idea);
+        call.enqueue(new Callback<Idea>() {
+            @Override
+            public void onResponse(Call<Idea> call, Response<Idea> response) {
+                int statusCode = response.code();
+                Log.d(TAG, "status is - " + statusCode);
+                if (statusCode == 200) {
+                    Idea idea = response.body();
+                    Log.d(TAG, "created idea is: " + idea.idea);
+                    // Finish this Activity, back to the stream
+                    setEditingEnabled(true);
+                    setResult(Activity.RESULT_OK);
+                    finish();
 
-                        // [START_EXCLUDE]
-                        if (user == null) {
-                            // User is null, error out
-                            Log.e(TAG, "User " + userId + " is unexpectedly null");
-                            Toast.makeText(NewIdeaActivity.this,
-                                    "Error: could not fetch user.",
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            // Write new post
-                            writeNewIdea(userId, user.username, body);
-                        }
+                } else {
 
-                        // Finish this Activity, back to the stream
-                        setEditingEnabled(true);
-                        finish();
-                        // [END_EXCLUDE]
-                    }
+                    Log.e(TAG, "500 when creating idea: " + response.body());
+                    setEditingEnabled(true);
+                }
+            }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.w(TAG, "getUser:onCancelled", databaseError.toException());
-                        // [START_EXCLUDE]
-                        setEditingEnabled(true);
-                        // [END_EXCLUDE]
-                    }
-                });
-        // [END single_value_read]
+            @Override
+            public void onFailure(Call<Idea> call, Throwable t) {
+                // Log error here since request failed
+                Log.d(TAG, "created user failed: ");
+                setEditingEnabled(true);
+            }
+        });
     }
 
     private void setEditingEnabled(boolean enabled) {
@@ -107,25 +106,6 @@ public class NewIdeaActivity extends BaseActivity {
         } else {
             mSubmitButton.setVisibility(View.GONE);
         }
-    }
-
-    private void writeNewIdea(String userId, String username, String body) {
-        String ideasPath = "/user-ideas/" + userId;
-        String key = mDatabase.child(ideasPath).push().getKey();
-        Idea idea = new Idea(userId, username, false, body);
-        Map<String, Object> ideaValues = idea.toMap();
-
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(ideasPath + "/" + key, ideaValues);
-
-        ArrayList<String> tags = Utils.getHashTags(body);
-        for (String tag : tags) {
-            tag = tag.trim().substring(1);
-            Log.d(TAG, "tags are: " + "/user-tags/" + userId + "/" + tag + "/" + key);
-            childUpdates.put("/user-tags/" + userId + "/" + tag + "/" + key, true);
-        }
-
-        mDatabase.updateChildren(childUpdates);
     }
 
 

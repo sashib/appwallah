@@ -8,16 +8,24 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.appwallah.ideawallah.api.IdeawallahApiService;
+import com.appwallah.ideawallah.api.IdeawallahApiServiceInterface;
 import com.appwallah.ideawallah.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignInActivity extends BaseActivity implements View.OnClickListener {
 
@@ -25,7 +33,10 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
 
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
+    private String currentUserToken;
 
+    private LinearLayout mFormLayout;
+    private LinearLayout mButtonsLayout;
     private EditText mEmailField;
     private EditText mPasswordField;
     private Button mSignInButton;
@@ -38,8 +49,10 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
 
         getSupportActionBar().hide();
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
+
+        mFormLayout = (LinearLayout) findViewById(R.id.layout_email_password);
+        mButtonsLayout = (LinearLayout) findViewById(R.id.layout_buttons);
 
         // Views
         mEmailField = (EditText) findViewById(R.id.field_email);
@@ -59,6 +72,9 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         // Check auth on Activity start
         if (mAuth.getCurrentUser() != null) {
             onAuthSuccess(mAuth.getCurrentUser());
+        } else {
+            mFormLayout.setVisibility(View.VISIBLE);
+            mButtonsLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -116,15 +132,26 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
                 });
     }
 
-    private void onAuthSuccess(FirebaseUser user) {
-        String username = usernameFromEmail(user.getEmail());
+    private void onAuthSuccess(final FirebaseUser user) {
 
-        // Write new user
-        writeNewUser(user.getUid(), username, user.getEmail());
+        user.getToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+            @Override
+            public void onComplete(@NonNull Task<GetTokenResult> task) {
+                if (task.isSuccessful()) {
+                    currentUserToken = task.getResult().getToken();
+                    Utils.saveToken(getBaseContext(), currentUserToken);
 
-        // Go to MainActivity
-        startActivity(new Intent(SignInActivity.this, MainActivity.class));
-        finish();
+                    Log.d(TAG, "TOKEN IS: " + currentUserToken);
+                    String username = usernameFromEmail(user.getEmail());
+                    registerUser(user.getUid(), username, user.getEmail());
+
+                    // Go to MainActivity
+                    startActivity(new Intent(SignInActivity.this, MainActivity.class));
+                    finish();
+                }
+            }
+        });
+
     }
 
     private String usernameFromEmail(String email) {
@@ -154,10 +181,35 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         return result;
     }
 
-    private void writeNewUser(String userId, String name, String email) {
-        User user = new User(name, email);
+    private void registerUser(String userId, String name, String email) {
+        User user = new User();
+        user.name = name;
+        user.email = email;
+        user.userId = userId;
 
-        mDatabase.child("users").child(userId).setValue(user);
+
+        IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
+        Call<User> call = apiService.createUser(Utils.getToken(getBaseContext()), user);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                int statusCode = response.code();
+                Log.d(TAG, "status is - " + statusCode);
+                if (statusCode == 200) {
+                    User user = response.body();
+                    Log.d(TAG, "created user is: " + user.email);
+                } else {
+
+                    Log.e(TAG, "500 when creating suer: " + response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                // Log error here since request failed
+                Log.d(TAG, "created user failed: ");
+            }
+        });
     }
 
     @Override

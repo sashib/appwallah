@@ -5,14 +5,22 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/default_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="10dp"
+        android:textSize="18sp"
+        android:text="@string/no_ideas"/>
+
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/messages_list"
+        android:id="@+id/ideas_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:clipToPadding="false"
-        android:padding="5dp"
-        android:scrollbars="none"
-        tools:listitem="@layout/item_idea" />
+        android:scrollbars="none" />
 
 </FrameLayout>

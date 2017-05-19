@@ -11,10 +11,12 @@ public class MyIdeasFragment extends IdeaListFragment {
 
     public MyIdeasFragment() {}
 
+    /*
     @Override
     public Query getQuery(DatabaseReference databaseReference) {
         // All my posts
         return databaseReference.child("user-ideas")
                 .child(getUid());
     }
+    */
 }

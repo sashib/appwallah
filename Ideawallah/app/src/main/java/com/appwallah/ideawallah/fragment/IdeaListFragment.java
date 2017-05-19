@@ -1,33 +1,36 @@
 package com.appwallah.ideawallah.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.appwallah.ideawallah.R;
+import com.appwallah.ideawallah.Utils;
+import com.appwallah.ideawallah.adapters.IdeasAdapter;
+import com.appwallah.ideawallah.api.IdeawallahApiService;
+import com.appwallah.ideawallah.api.IdeawallahApiServiceInterface;
 import com.appwallah.ideawallah.models.Idea;
-import com.appwallah.ideawallah.viewholder.IdeaViewHolder;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.Transaction;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by sbommakanty on 2/13/17.
  */
 
-public abstract class IdeaListFragment extends Fragment {
+public class IdeaListFragment extends Fragment {
 
     private static final String TAG = "IdeaListFragment";
 
@@ -35,9 +38,15 @@ public abstract class IdeaListFragment extends Fragment {
     private DatabaseReference mDatabase;
     // [END define_database_reference]
 
-    private FirebaseRecyclerAdapter<Idea, IdeaViewHolder> mAdapter;
+    private IdeasAdapter mAdapter;
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
+    private TextView mDefaultText;
+
+    private List<Idea> mIdeasList;
+
+    private int mIdeasLimit = 25;
+    private int mIdeasPage = 0;
 
     public IdeaListFragment() {}
 
@@ -47,12 +56,12 @@ public abstract class IdeaListFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_all_ideas, container, false);
 
-        // [START create_database_reference]
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        // [END create_database_reference]
-
-        mRecycler = (RecyclerView) rootView.findViewById(R.id.messages_list);
+        mRecycler = (RecyclerView) rootView.findViewById(R.id.ideas_list);
         mRecycler.setHasFixedSize(true);
+
+        mDefaultText = (TextView) rootView.findViewById(R.id.default_text);
+
+        mIdeasList = new ArrayList<>();
 
         return rootView;
     }
@@ -63,104 +72,62 @@ public abstract class IdeaListFragment extends Fragment {
 
         // Set up Layout Manager, reverse layout
         mManager = new LinearLayoutManager(getActivity());
-        mManager.setReverseLayout(true);
-        mManager.setStackFromEnd(true);
+        //mManager.setReverseLayout(true);
+        //mManager.setStackFromEnd(true);
+        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(getContext(),
+                mManager.getOrientation());
+        mRecycler.addItemDecoration(mDividerItemDecoration);
         mRecycler.setLayoutManager(mManager);
 
-        // Set up FirebaseRecyclerAdapter with the Query
-        Query ideasQuery = getQuery(mDatabase);
-        mAdapter = new FirebaseRecyclerAdapter<Idea, IdeaViewHolder>(Idea.class, R.layout.item_idea,
-                IdeaViewHolder.class, ideasQuery) {
-            @Override
-            protected void populateViewHolder(final IdeaViewHolder viewHolder, final Idea model, final int position) {
-                final DatabaseReference postRef = getRef(position);
+        loadIdeas();
 
-                // Set click listener for the whole post view
-                /*
-                final String postKey = postRef.getKey();
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Launch PostDetailActivity
-                        Intent intent = new Intent(getActivity(), IdeaDetailActivity.class);
-                        intent.putExtra(IdeaDetailActivity.EXTRA_POST_KEY, postKey);
-                        startActivity(intent);
-                    }
-                });
-                */
-
-                // Determine if the current user has liked this post and set UI accordingly
-                //if (model.stars.containsKey(getUid())) {
-                //    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_24);
-                //} else {
-                //    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_outline_24);
-                //}
-
-                // Bind Post to ViewHolder, setting OnClickListener for the star button
-                viewHolder.bindToIdea(model, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View starView) {
-                        // Need to write to both places the post is stored
-                        //DatabaseReference globalPostRef = mDatabase.child("posts").child(postRef.getKey());
-                        DatabaseReference userPostRef = mDatabase.child("user-ideas").child(model.uid).child(postRef.getKey());
-
-                        // Run two transactions
-                        //onStarClicked(globalPostRef);
-                        //onStarClicked(userPostRef);
-                    }
-                });
-            }
-        };
-        mRecycler.setAdapter(mAdapter);
     }
 
-    // [START post_stars_transaction]
-    private void onStarClicked(DatabaseReference ideaRef) {
-        ideaRef.runTransaction(new Transaction.Handler() {
+    public void loadIdeas() {
+
+        IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
+        Call<List<Idea>> call = apiService.getIdeas(Utils.getToken(getContext()), Integer.toString(mIdeasLimit), Integer.toString(mIdeasPage));
+        call.enqueue(new Callback<List<Idea>>() {
             @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-                Idea p = mutableData.getValue(Idea.class);
-                if (p == null) {
-                    return Transaction.success(mutableData);
-                }
+            public void onResponse(Call<List<Idea>> call, Response<List<Idea>> response) {
+                int statusCode = response.code();
+                Log.d(TAG, "status is - " + statusCode);
+                if (statusCode == 200) {
+                    List<Idea> ideas = response.body();
+                    int itemsCount = ideas.size();
+                    if (itemsCount > 0) {
+                        mDefaultText.setVisibility(View.GONE);
+                        if (mIdeasPage==0) {
+                            mIdeasList.clear();
+                        }
+                        if (itemsCount >= mIdeasLimit)
+                            mIdeasPage++;
 
-                if (p.stars.containsKey(getUid())) {
-                    // Unstar the post and remove self from stars
-                    p.starCount = p.starCount - 1;
-                    p.stars.remove(getUid());
+                        mIdeasList.addAll(ideas);
+                        mAdapter = new IdeasAdapter(mIdeasList);
+                        mAdapter.notifyDataSetChanged();
+                        mRecycler.setAdapter(mAdapter);
+
+                    }
+
                 } else {
-                    // Star the post and add self to stars
-                    p.starCount = p.starCount + 1;
-                    p.stars.put(getUid(), true);
-                }
 
-                // Set value and report transaction success
-                mutableData.setValue(p);
-                return Transaction.success(mutableData);
+                    Log.e(TAG, "500 when creating user: " + response.body());
+                }
             }
 
             @Override
-            public void onComplete(DatabaseError databaseError, boolean b,
-                                   DataSnapshot dataSnapshot) {
-                // Transaction completed
-                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+            public void onFailure(Call<List<Idea>> call, Throwable t) {
+                // Log error here since request failed
+                Log.e(TAG, "getting ideas list failed: ");
             }
         });
     }
-    // [END post_stars_transaction]
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mAdapter != null) {
-            mAdapter.cleanup();
-        }
     }
 
-    public String getUid() {
-        return FirebaseAuth.getInstance().getCurrentUser().getUid();
-    }
-
-    public abstract Query getQuery(DatabaseReference databaseReference);
 
 }

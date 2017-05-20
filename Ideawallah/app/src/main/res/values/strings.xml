@@ -11,5 +11,10 @@
     <string name="heading_my_ideas">My Ideas</string>
     <string name="hashtag">#</string>
     <string name="no_ideas">Start Ideating! \n\ntry coming up with ideas for movie scripts, gadgets, party themes, diet</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="days_ago">days ago</string>
+    <string name="while_back">A while back</string>
+
 
 </resources>

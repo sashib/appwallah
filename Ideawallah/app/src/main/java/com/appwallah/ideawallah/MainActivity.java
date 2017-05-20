@@ -11,8 +11,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.appwallah.ideawallah.fragment.AllIdeasFragment;
 import com.appwallah.ideawallah.fragment.IdeaListFragment;
-import com.appwallah.ideawallah.fragment.MyIdeasFragment;
 
 public class MainActivity extends BaseActivity {
 
@@ -31,7 +31,7 @@ public class MainActivity extends BaseActivity {
         // Create the adapter that will return a fragment for each section
         mPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             private final Fragment[] mFragments = new Fragment[] {
-                    new IdeaListFragment()
+                    new AllIdeasFragment()
             };
             private final String[] mFragmentNames = new String[] {
                     getString(R.string.heading_my_ideas)

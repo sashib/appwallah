@@ -13,9 +13,11 @@ import android.widget.TextView;
 
 import com.appwallah.ideawallah.R;
 import com.appwallah.ideawallah.Utils;
+import com.appwallah.ideawallah.adapters.HashTagAdapter;
 import com.appwallah.ideawallah.adapters.IdeaAdapter;
 import com.appwallah.ideawallah.api.IdeawallahApiService;
 import com.appwallah.ideawallah.api.IdeawallahApiServiceInterface;
+import com.appwallah.ideawallah.models.HashTag;
 import com.appwallah.ideawallah.models.Idea;
 import com.google.firebase.database.DatabaseReference;
 
@@ -27,37 +29,36 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Created by sbommakanty on 2/13/17.
+ * Created by sbommakanty on 5/19/17.
  */
 
-public abstract class IdeaListFragment extends Fragment {
+public class HashTagListFragment extends Fragment {
 
-    private static final String TAG = "IdeaListFragment";
+    private static final String TAG = "HashTagListFragment";
 
-    private IdeaAdapter mAdapter;
+    private HashTagAdapter mAdapter;
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
     private TextView mDefaultText;
 
-    private List<Idea> mIdeasList;
+    private List<HashTag> mHashTagsList;
 
-    public int mIdeasLimit = 25;
-    public int mIdeasPage = 0;
+    private int mLimit = 25;
+    private int mPage = 0;
 
-    public IdeaListFragment() {}
+    public HashTagListFragment() {}
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View rootView = inflater.inflate(R.layout.fragment_all_ideas, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_all_tags, container, false);
 
-        mRecycler = (RecyclerView) rootView.findViewById(R.id.ideas_list);
+        mRecycler = (RecyclerView) rootView.findViewById(R.id.tags_list);
         mRecycler.setHasFixedSize(true);
 
-        mDefaultText = (TextView) rootView.findViewById(R.id.default_text);
 
-        mIdeasList = new ArrayList<>();
+        mHashTagsList = new ArrayList<>();
 
         return rootView;
     }
@@ -75,33 +76,25 @@ public abstract class IdeaListFragment extends Fragment {
         mRecycler.addItemDecoration(mDividerItemDecoration);
         mRecycler.setLayoutManager(mManager);
 
-        loadIdeas();
+        loadHashTags();
 
     }
 
-    public void loadIdeas() {
+    public void loadHashTags() {
 
-        //IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
-        //Call<List<Idea>> call = apiService.getIdeas(Utils.getToken(getContext()), Integer.toString(mIdeasLimit), Integer.toString(mIdeasPage));
-        Call<List<Idea>> call = getIdeas();
-        call.enqueue(new Callback<List<Idea>>() {
+        IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
+        Call<List<HashTag>> call = apiService.getHashTags(Utils.getToken(getContext()));
+        call.enqueue(new Callback<List<HashTag>>() {
             @Override
-            public void onResponse(Call<List<Idea>> call, Response<List<Idea>> response) {
+            public void onResponse(Call<List<HashTag>> call, Response<List<HashTag>> response) {
                 int statusCode = response.code();
                 Log.d(TAG, "status is - " + statusCode);
                 if (statusCode == 200) {
-                    List<Idea> ideas = response.body();
-                    int itemsCount = ideas.size();
+                    List<HashTag> hashtags = response.body();
+                    int itemsCount = hashtags.size();
                     if (itemsCount > 0) {
-                        mDefaultText.setVisibility(View.GONE);
-                        if (mIdeasPage==0) {
-                            mIdeasList.clear();
-                        }
-                        if (itemsCount >= mIdeasLimit)
-                            mIdeasPage++;
-
-                        mIdeasList.addAll(ideas);
-                        mAdapter = new IdeaAdapter(getContext(), mIdeasList);
+                        mHashTagsList.addAll(hashtags);
+                        mAdapter = new HashTagAdapter(mHashTagsList);
                         mAdapter.notifyDataSetChanged();
                         mRecycler.setAdapter(mAdapter);
 
@@ -114,7 +107,7 @@ public abstract class IdeaListFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<List<Idea>> call, Throwable t) {
+            public void onFailure(Call<List<HashTag>> call, Throwable t) {
                 // Log error here since request failed
                 Log.e(TAG, "getting ideas list failed: ");
             }
@@ -126,5 +119,5 @@ public abstract class IdeaListFragment extends Fragment {
         super.onDestroy();
     }
 
-    public abstract Call<List<Idea>> getIdeas();
+
 }

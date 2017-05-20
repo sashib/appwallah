@@ -6,17 +6,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.appwallah.ideawallah.R;
+import com.appwallah.ideawallah.models.HashTag;
 import com.appwallah.ideawallah.models.Idea;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by sbommakanty on 5/19/17.
  */
 
-public class IdeasAdapter extends RecyclerView.Adapter<IdeasAdapter.ViewHolder> {
-    private List<Idea> mIdeasList;
+public class HashTagAdapter extends RecyclerView.Adapter<HashTagAdapter.ViewHolder> {
+    private List<HashTag> mHashTagList;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
@@ -28,17 +28,17 @@ public class IdeasAdapter extends RecyclerView.Adapter<IdeasAdapter.ViewHolder> 
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public IdeasAdapter(List<Idea> ideas) {
-        mIdeasList = ideas;
+    public HashTagAdapter(List<HashTag> hashtags) {
+        mHashTagList = hashtags;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
-    public IdeasAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                   int viewType) {
+    public HashTagAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                      int viewType) {
         // create a new view
         TextView v = (TextView) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.include_idea_text, parent, false);
+                .inflate(R.layout.item_tag, parent, false);
 
 
         ViewHolder vh = new ViewHolder(v);
@@ -50,16 +50,14 @@ public class IdeasAdapter extends RecyclerView.Adapter<IdeasAdapter.ViewHolder> 
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.mTextView.setText(mIdeasList.get(position).idea);
+        holder.mTextView.setText(mHashTagList.get(position).hashtag);
 
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mIdeasList.size();
+        return mHashTagList.size();
     }
 }
-
-
 

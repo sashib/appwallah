@@ -1,5 +1,6 @@
 package com.appwallah.ideawallah.api;
 
+import com.appwallah.ideawallah.models.HashTag;
 import com.appwallah.ideawallah.models.Idea;
 import com.appwallah.ideawallah.models.User;
 
@@ -20,6 +21,9 @@ import retrofit2.http.Query;
  */
 
 public interface IdeawallahApiServiceInterface {
+
+    @GET("hashtags")
+    Call<List<HashTag>> getHashTags(@Header("X-Access-Token") String token);
 
     @GET("ideas")
     Call<List<Idea>> getIdeas(@Header("X-Access-Token") String token, @Query("limit") String limit, @Query("page") String page);

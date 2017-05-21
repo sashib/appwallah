@@ -97,7 +97,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void showTags() {
-        Intent intent = new Intent(this, TagsActivity.class);
+        Intent intent = new Intent(this, HasTagsActivity.class);
         startActivity(intent);
     }
 

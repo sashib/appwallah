@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -76,6 +77,22 @@ public class HashTagListFragment extends Fragment {
         mRecycler.addItemDecoration(mDividerItemDecoration);
         mRecycler.setLayoutManager(mManager);
 
+        mRecycler.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
         loadHashTags();
 
     }
@@ -94,7 +111,7 @@ public class HashTagListFragment extends Fragment {
                     int itemsCount = hashtags.size();
                     if (itemsCount > 0) {
                         mHashTagsList.addAll(hashtags);
-                        mAdapter = new HashTagAdapter(mHashTagsList);
+                        mAdapter = new HashTagAdapter(getContext(), mHashTagsList);
                         mAdapter.notifyDataSetChanged();
                         mRecycler.setAdapter(mAdapter);
 

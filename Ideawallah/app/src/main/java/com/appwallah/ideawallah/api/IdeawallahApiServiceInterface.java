@@ -14,6 +14,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
@@ -27,6 +28,9 @@ public interface IdeawallahApiServiceInterface {
 
     @GET("ideas")
     Call<List<Idea>> getIdeas(@Header("X-Access-Token") String token, @Query("limit") String limit, @Query("page") String page);
+
+    @GET("ideas/{hashtag}")
+    Call<List<Idea>> getIdeasByHashTag(@Header("X-Access-Token") String token, @Path("hashtag") String hashtag, @Query("limit") String limit, @Query("page") String page);
 
     @Headers("Accept: application/json")
     @POST("users")

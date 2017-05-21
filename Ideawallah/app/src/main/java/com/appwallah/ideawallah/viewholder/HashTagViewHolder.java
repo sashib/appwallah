@@ -13,11 +13,11 @@ import java.util.Map;
  * Created by sbommakanty on 4/15/17.
  */
 
-public class TagViewHolder extends RecyclerView.ViewHolder {
+public class HashTagViewHolder extends RecyclerView.ViewHolder {
 
     public TextView tagView;
 
-    public TagViewHolder(View itemView) {
+    public HashTagViewHolder(View itemView) {
         super(itemView);
 
         tagView = (TextView) itemView.findViewById(R.id.tag_text);

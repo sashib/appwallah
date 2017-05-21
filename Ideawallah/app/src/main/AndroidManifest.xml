@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".NewIdeaActivity" />
-        <activity android:name=".TagsActivity"></activity>
+        <activity android:name=".HasTagsActivity" />
+        <activity android:name=".HashTagIdeasActivity"></activity>
     </application>
 
 </manifest>

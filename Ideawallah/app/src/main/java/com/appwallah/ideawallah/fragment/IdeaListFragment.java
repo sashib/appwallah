@@ -46,6 +46,7 @@ public abstract class IdeaListFragment extends Fragment {
 
     public IdeaListFragment() {}
 
+
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container,
                               Bundle savedInstanceState) {

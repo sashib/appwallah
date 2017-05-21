@@ -2,7 +2,11 @@ package com.appwallah.ideawallah;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.Spannable;
+import android.text.TextPaint;
+import android.text.style.URLSpan;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -33,6 +37,47 @@ public class Utils {
         }
         return tags;
 
+    }
+
+    public static String getLinkifiedIdea(String idea) {
+        String linkifiedIdea = idea;
+
+        String pattern = "(^|\\s)(#[a-z\\d-]+)";
+
+        Matcher m = Pattern.compile(pattern).matcher(idea);
+        while (m.find()) {
+            //String link = "<font color='#33b5e5'>" + m.group() + "</font>";
+            String hashtag = m.group();
+            String hashtagVal = hashtag.substring(2);
+            String link = "<font color='#33b5e5'><a href='ideawallah://hashtagideas?hashtag=" + hashtagVal + "'>" + m.group() + "</a></font>";
+            linkifiedIdea = linkifiedIdea.replaceFirst(m.group(), link);
+        }
+        return linkifiedIdea;
+
+    }
+
+    private static class URLSpanNoUnderline extends URLSpan {
+        public URLSpanNoUnderline(String url) {
+            super(url);
+        }
+        @Override public void updateDrawState(TextPaint ds) {
+            super.updateDrawState(ds);
+            ds.setUnderlineText(false);
+        }
+    }
+
+    // http://stackoverflow.com/questions/4096851/remove-underline-from-links-in-textview-android
+    public static void stripUnderlines(TextView textView) {
+        Spannable s = (Spannable)textView.getText();
+        URLSpan[] spans = s.getSpans(0, s.length(), URLSpan.class);
+        for (URLSpan span: spans) {
+            int start = s.getSpanStart(span);
+            int end = s.getSpanEnd(span);
+            s.removeSpan(span);
+            span = new URLSpanNoUnderline(span.getURL());
+            s.setSpan(span, start, end, 0);
+        }
+        textView.setText(s);
     }
 
     public static void saveToken(Context context, String token) {

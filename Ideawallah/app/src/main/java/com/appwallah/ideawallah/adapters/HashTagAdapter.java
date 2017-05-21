@@ -3,6 +3,7 @@ package com.appwallah.ideawallah.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,6 +70,7 @@ public class HashTagAdapter extends RecyclerView.Adapter<HashTagAdapter.ViewHold
         // create a new view
         TextView v = (TextView) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_tag, parent, false);
+
 
         ViewHolder vh = new ViewHolder(mContext, v);
         return vh;

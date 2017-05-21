@@ -1,7 +1,11 @@
 package com.appwallah.ideawallah.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -18,6 +22,9 @@ import java.util.List;
  */
 
 public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder> {
+
+    private static final String TAG = "IdeaAdapter";
+
     private List<Idea> mIdeasList;
     private Context mContext;
 
@@ -28,6 +35,9 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder> {
         public ViewHolder(LinearLayout v) {
             super(v);
             ideaText = (TextView) v.findViewById(R.id.idea_text);
+            ideaText.setMovementMethod(LinkMovementMethod.getInstance());
+
+
             dateText = (TextView) v.findViewById(R.id.date_text);
         }
     }
@@ -56,7 +66,11 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder> {
         Idea idea = mIdeasList.get(position);
         String days = Utils.getIdeaDay(mContext, idea.date);
 
-        holder.ideaText.setText(idea.idea);
+        String htmlText = Utils.getLinkifiedIdea(idea.idea);
+        Log.d(TAG, "htmltext is: " + htmlText);
+        holder.ideaText.setText(Html.fromHtml(htmlText));
+        Utils.stripUnderlines(holder.ideaText);
+        holder.ideaText.setLinkTextColor(Color.rgb(51,181,229));
         holder.dateText.setText(days);
 
     }

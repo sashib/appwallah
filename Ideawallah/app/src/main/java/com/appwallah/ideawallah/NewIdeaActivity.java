@@ -1,7 +1,9 @@
 package com.appwallah.ideawallah;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +15,10 @@ import com.appwallah.ideawallah.api.IdeawallahApiService;
 import com.appwallah.ideawallah.api.IdeawallahApiServiceInterface;
 import com.appwallah.ideawallah.models.Idea;
 import com.appwallah.ideawallah.models.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -65,38 +71,50 @@ public class NewIdeaActivity extends BaseActivity {
         setEditingEnabled(false);
         Toast.makeText(this, "Saving a great idea...", Toast.LENGTH_SHORT).show();
 
-        Idea idea = new Idea();
-        idea.idea = body;
-        idea.global = false;
-        IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
-        Call<Idea> call = apiService.createIdea(Utils.getToken(getBaseContext()), idea);
-        call.enqueue(new Callback<Idea>() {
+
+        FirebaseAuth.getInstance().getCurrentUser().getToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
-            public void onResponse(Call<Idea> call, Response<Idea> response) {
-                int statusCode = response.code();
-                Log.d(TAG, "status is - " + statusCode);
-                if (statusCode == 200) {
-                    Idea idea = response.body();
-                    Log.d(TAG, "created idea is: " + idea.idea);
-                    // Finish this Activity, back to the stream
-                    setEditingEnabled(true);
-                    setResult(Activity.RESULT_OK);
-                    finish();
+            public void onComplete(@NonNull Task<GetTokenResult> task) {
+                if (task.isSuccessful()) {
+                    String token = task.getResult().getToken();
 
-                } else {
+                    Idea idea = new Idea();
+                    idea.idea = body;
+                    idea.global = false;
+                    IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
+                    Call<Idea> call = apiService.createIdea(token, idea);
+                    call.enqueue(new Callback<Idea>() {
+                        @Override
+                        public void onResponse(Call<Idea> call, Response<Idea> response) {
+                            int statusCode = response.code();
+                            Log.d(TAG, "status is - " + statusCode);
+                            if (statusCode == 200) {
+                                Idea idea = response.body();
+                                Log.d(TAG, "created idea is: " + idea.idea);
+                                // Finish this Activity, back to the stream
+                                setEditingEnabled(true);
+                                setResult(Activity.RESULT_OK);
+                                finish();
 
-                    Log.e(TAG, "500 when creating idea: " + response.body());
-                    setEditingEnabled(true);
+                            } else {
+
+                                Log.e(TAG, "500 when creating idea: " + response.body());
+                                setEditingEnabled(true);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Idea> call, Throwable t) {
+                            // Log error here since request failed
+                            Log.d(TAG, "created user failed: ");
+                            setEditingEnabled(true);
+                        }
+                    });
+
                 }
             }
-
-            @Override
-            public void onFailure(Call<Idea> call, Throwable t) {
-                // Log error here since request failed
-                Log.d(TAG, "created user failed: ");
-                setEditingEnabled(true);
-            }
         });
+
     }
 
     private void setEditingEnabled(boolean enabled) {

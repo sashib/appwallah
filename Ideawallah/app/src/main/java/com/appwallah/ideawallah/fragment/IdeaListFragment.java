@@ -1,6 +1,8 @@
 package com.appwallah.ideawallah.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,12 +13,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.appwallah.ideawallah.MainActivity;
 import com.appwallah.ideawallah.R;
+import com.appwallah.ideawallah.SignInActivity;
 import com.appwallah.ideawallah.Utils;
 import com.appwallah.ideawallah.adapters.IdeaAdapter;
 import com.appwallah.ideawallah.api.IdeawallahApiService;
 import com.appwallah.ideawallah.api.IdeawallahApiServiceInterface;
 import com.appwallah.ideawallah.models.Idea;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
@@ -41,8 +50,15 @@ public abstract class IdeaListFragment extends Fragment {
 
     private List<Idea> mIdeasList;
 
-    public int mIdeasLimit = 25;
+    public int mIdeasLimit = 10;
     public int mIdeasPage = 0;
+
+    public String mToken;
+
+    private boolean mLoading = true;
+    private int pastVisiblesItems, visibleItemCount, totalItemCount;
+
+
 
     public IdeaListFragment() {}
 
@@ -76,50 +92,82 @@ public abstract class IdeaListFragment extends Fragment {
         mRecycler.addItemDecoration(mDividerItemDecoration);
         mRecycler.setLayoutManager(mManager);
 
+        mRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if(dy > 0) {
+                    visibleItemCount = mManager.getChildCount();
+                    totalItemCount = mManager.getItemCount();
+                    pastVisiblesItems = mManager.findFirstVisibleItemPosition();
+
+                    if (mLoading){
+                        if ( (visibleItemCount + pastVisiblesItems) >= totalItemCount){
+                            mLoading = false;
+                            Log.v("...", "Last Item Wow !");
+                            //Do pagination.. i.e. fetch new data
+                            loadIdeas();
+
+                        }
+                    }
+                }
+            }
+        });
+
         loadIdeas();
 
     }
 
+
     public void loadIdeas() {
 
-        //IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
-        //Call<List<Idea>> call = apiService.getIdeas(Utils.getToken(getContext()), Integer.toString(mIdeasLimit), Integer.toString(mIdeasPage));
-        Call<List<Idea>> call = getIdeas();
-        call.enqueue(new Callback<List<Idea>>() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user.getToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
-            public void onResponse(Call<List<Idea>> call, Response<List<Idea>> response) {
-                int statusCode = response.code();
-                Log.d(TAG, "status is - " + statusCode);
-                if (statusCode == 200) {
-                    List<Idea> ideas = response.body();
-                    int itemsCount = ideas.size();
-                    if (itemsCount > 0) {
-                        mDefaultText.setVisibility(View.GONE);
-                        if (mIdeasPage==0) {
-                            mIdeasList.clear();
+            public void onComplete(@NonNull Task<GetTokenResult> task) {
+                if (task.isSuccessful()) {
+                    mToken = task.getResult().getToken();
+                    Call<List<Idea>> call = getIdeas();
+                    call.enqueue(new Callback<List<Idea>>() {
+                        @Override
+                        public void onResponse(Call<List<Idea>> call, Response<List<Idea>> response) {
+                            int statusCode = response.code();
+                            Log.d(TAG, "status is - " + statusCode);
+                            if (statusCode == 200) {
+                                List<Idea> ideas = response.body();
+                                int itemsCount = ideas.size();
+                                if (itemsCount > 0) {
+                                    mDefaultText.setVisibility(View.GONE);
+                                    if (mIdeasPage==0) {
+                                        mIdeasList.clear();
+                                    }
+                                    if (itemsCount >= mIdeasLimit)
+                                        mIdeasPage++;
+
+                                    mIdeasList.addAll(ideas);
+                                    mAdapter = new IdeaAdapter(getContext(), mIdeasList);
+                                    mAdapter.notifyDataSetChanged();
+                                    mRecycler.setAdapter(mAdapter);
+
+                                }
+
+                            } else {
+
+                                Log.e(TAG, "500 when creating user: " + response.body());
+                            }
                         }
-                        if (itemsCount >= mIdeasLimit)
-                            mIdeasPage++;
 
-                        mIdeasList.addAll(ideas);
-                        mAdapter = new IdeaAdapter(getContext(), mIdeasList);
-                        mAdapter.notifyDataSetChanged();
-                        mRecycler.setAdapter(mAdapter);
+                        @Override
+                        public void onFailure(Call<List<Idea>> call, Throwable t) {
+                            // Log error here since request failed
+                            Log.e(TAG, "getting ideas list failed: ");
+                        }
+                    });
 
-                    }
-
-                } else {
-
-                    Log.e(TAG, "500 when creating user: " + response.body());
                 }
             }
-
-            @Override
-            public void onFailure(Call<List<Idea>> call, Throwable t) {
-                // Log error here since request failed
-                Log.e(TAG, "getting ideas list failed: ");
-            }
         });
+
+
     }
 
     @Override

@@ -134,7 +134,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
 
     private void onAuthSuccess(final FirebaseUser user) {
 
-        user.getToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        user.getToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull Task<GetTokenResult> task) {
                 if (task.isSuccessful()) {
@@ -189,7 +189,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
 
 
         IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
-        Call<User> call = apiService.createUser(Utils.getToken(getBaseContext()), user);
+        Call<User> call = apiService.createUser(currentUserToken, user);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {

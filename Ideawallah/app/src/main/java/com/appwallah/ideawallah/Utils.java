@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,7 +94,6 @@ public class Utils {
     }
 
     public static String getIdeaDay(Context ctx, String dt) {
-        Log.d(TAG, "dt is: " + dt);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         Date ideaDate;
         String days = "Today";
@@ -101,12 +101,14 @@ public class Utils {
         try {
 
             ideaDate = dateFormat.parse(dt);
-            Date today = new Date();
 
-            Calendar c1 = Calendar.getInstance(); // today
+            Calendar c1 = Calendar.getInstance(TimeZone.getTimeZone("UTC")); // today
 
             Calendar c2 = Calendar.getInstance();
             c2.setTime(ideaDate); // your date
+
+            //Log.d(TAG, "c1 is: " + c1.toString());
+            //Log.d(TAG, "c2 is: " + c2.toString());
 
             if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR)
                     && c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR)) {
@@ -117,6 +119,7 @@ public class Utils {
                         && c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR)) {
                     days = ctx.getString(R.string.yesterday);
                 } else {
+                    c1.add(Calendar.DAY_OF_YEAR, +1);
                     int diff = c1.get(Calendar.DAY_OF_YEAR) - c2.get(Calendar.DAY_OF_YEAR);
                     days = Integer.toString(diff) + " " + ctx.getString(R.string.days_ago);
                     if (diff > 60) {
@@ -131,7 +134,7 @@ public class Utils {
 
         }
 
-        Log.d(TAG, "returning days: " + days);
+        //Log.d(TAG, "returning days: " + days);
 
         return days;
     }

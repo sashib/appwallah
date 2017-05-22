@@ -1,6 +1,7 @@
 package com.appwallah.ideawallah.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,6 +21,11 @@ import com.appwallah.ideawallah.api.IdeawallahApiService;
 import com.appwallah.ideawallah.api.IdeawallahApiServiceInterface;
 import com.appwallah.ideawallah.models.HashTag;
 import com.appwallah.ideawallah.models.Idea;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
@@ -44,8 +50,12 @@ public class HashTagListFragment extends Fragment {
 
     private List<HashTag> mHashTagsList;
 
-    private int mLimit = 25;
+    private int mLimit = 5;
     private int mPage = 0;
+
+    private boolean mLoading = true;
+    private int pastVisiblesItems, visibleItemCount, totalItemCount;
+
 
     public HashTagListFragment() {}
 
@@ -77,58 +87,82 @@ public class HashTagListFragment extends Fragment {
         mRecycler.addItemDecoration(mDividerItemDecoration);
         mRecycler.setLayoutManager(mManager);
 
-        mRecycler.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+        mRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                return false;
-            }
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if(dy > 0) {
+                    visibleItemCount = mManager.getChildCount();
+                    totalItemCount = mManager.getItemCount();
+                    pastVisiblesItems = mManager.findFirstVisibleItemPosition();
 
-            @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+                    if (mLoading){
+                        if ( (visibleItemCount + pastVisiblesItems) >= totalItemCount){
+                            mLoading = false;
+                            Log.v("...", "Last Item Wow !");
+                            //Do pagination.. i.e. fetch new data
+                            loadHashTags();
 
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
+                        }
+                    }
+                }
             }
         });
+
         loadHashTags();
 
     }
 
     public void loadHashTags() {
 
-        IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
-        Call<List<HashTag>> call = apiService.getHashTags(Utils.getToken(getContext()));
-        call.enqueue(new Callback<List<HashTag>>() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user.getToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
-            public void onResponse(Call<List<HashTag>> call, Response<List<HashTag>> response) {
-                int statusCode = response.code();
-                Log.d(TAG, "status is - " + statusCode);
-                if (statusCode == 200) {
-                    List<HashTag> hashtags = response.body();
-                    int itemsCount = hashtags.size();
-                    if (itemsCount > 0) {
-                        mHashTagsList.addAll(hashtags);
-                        mAdapter = new HashTagAdapter(getContext(), mHashTagsList);
-                        mAdapter.notifyDataSetChanged();
-                        mRecycler.setAdapter(mAdapter);
+            public void onComplete(@NonNull Task<GetTokenResult> task) {
+                if (task.isSuccessful()) {
+                    String token = task.getResult().getToken();
 
-                    }
+                    IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
+                    Call<List<HashTag>> call = apiService.getHashTags(token, Integer.toString(mLimit), Integer.toString(mPage));
+                    call.enqueue(new Callback<List<HashTag>>() {
+                        @Override
+                        public void onResponse(Call<List<HashTag>> call, Response<List<HashTag>> response) {
+                            int statusCode = response.code();
+                            Log.d(TAG, "status is - " + statusCode);
+                            if (statusCode == 200) {
 
-                } else {
+                                List<HashTag> hashtags = response.body();
+                                int itemsCount = hashtags.size();
+                                if (itemsCount > 0) {
+                                    if (mPage==0) {
+                                        mHashTagsList.clear();
+                                    }
+                                    if (itemsCount >= mLimit)
+                                        mPage++;
+                                    mHashTagsList.addAll(hashtags);
+                                    mAdapter = new HashTagAdapter(getContext(), mHashTagsList);
+                                    mAdapter.notifyDataSetChanged();
+                                    mRecycler.setAdapter(mAdapter);
 
-                    Log.e(TAG, "500 when creating user: " + response.body());
+                                }
+
+                            } else {
+
+                                Log.e(TAG, "500 when creating user: " + response.body());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<HashTag>> call, Throwable t) {
+                            // Log error here since request failed
+                            Log.e(TAG, "getting ideas list failed: ");
+                        }
+                    });
+
                 }
             }
-
-            @Override
-            public void onFailure(Call<List<HashTag>> call, Throwable t) {
-                // Log error here since request failed
-                Log.e(TAG, "getting ideas list failed: ");
-            }
         });
+
+
     }
 
     @Override

@@ -24,7 +24,7 @@ import retrofit2.http.Query;
 public interface IdeawallahApiServiceInterface {
 
     @GET("hashtags")
-    Call<List<HashTag>> getHashTags(@Header("X-Access-Token") String token);
+    Call<List<HashTag>> getHashTags(@Header("X-Access-Token") String token, @Query("limit") String limit, @Query("page") String page);
 
     @GET("ideas")
     Call<List<Idea>> getIdeas(@Header("X-Access-Token") String token, @Query("limit") String limit, @Query("page") String page);

@@ -67,7 +67,7 @@ public class IdeaAdapter extends RecyclerView.Adapter<IdeaAdapter.ViewHolder> {
         String days = Utils.getIdeaDay(mContext, idea.date);
 
         String htmlText = Utils.getLinkifiedIdea(idea.idea);
-        Log.d(TAG, "htmltext is: " + htmlText);
+
         holder.ideaText.setText(Html.fromHtml(htmlText));
         Utils.stripUnderlines(holder.ideaText);
         holder.ideaText.setLinkTextColor(Color.rgb(51,181,229));

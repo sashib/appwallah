@@ -134,12 +134,14 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
 
     private void onAuthSuccess(final FirebaseUser user) {
 
+        Log.d(TAG, "about to get token");
+
         user.getToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull Task<GetTokenResult> task) {
                 if (task.isSuccessful()) {
                     currentUserToken = task.getResult().getToken();
-                    Utils.saveToken(getBaseContext(), currentUserToken);
+                    //Utils.saveToken(getBaseContext(), currentUserToken);
 
                     Log.d(TAG, "TOKEN IS: " + currentUserToken);
                     String username = usernameFromEmail(user.getEmail());

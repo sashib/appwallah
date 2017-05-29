@@ -23,7 +23,7 @@ public class HashTagIdeasFragment extends IdeaListFragment {
     public Call<List<Idea>> getIdeas() {
         IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
         String hashtag = getArguments().getString(Extras.HASHTAG_EXTRA);
-        return apiService.getIdeasByHashTag(mToken, hashtag, Integer.toString(mIdeasLimit), Integer.toString(mIdeasPage));
+        return apiService.getIdeasByHashTag(mToken, hashtag, Integer.toString(mIdeasLimit+1), Integer.toString(mIdeasPage));
 
     }
 

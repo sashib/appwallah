@@ -3,6 +3,7 @@ package com.appwallah.ideawallah;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -83,7 +84,14 @@ public class MainActivity extends BaseActivity {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
 
-                ((IdeaListFragment)mPagerAdapter.getItem(0)).loadIdeas();
+                IdeaListFragment fr = ((IdeaListFragment)mPagerAdapter.getItem(0));
+                if (fr.getView() != null) {
+                    Log.d(TAG, "fragment isn't null, so will call loadideas");
+                    fr.loadIdeasFromStart();
+
+                }
+
+
             }
         }
     }

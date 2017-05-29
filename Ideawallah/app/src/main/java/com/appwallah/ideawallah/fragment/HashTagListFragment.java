@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +48,11 @@ public class HashTagListFragment extends Fragment {
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
     private TextView mDefaultText;
+    private AVLoadingIndicatorView mAvi;
 
     private List<HashTag> mHashTagsList;
 
-    private int mLimit = 5;
+    private int mLimit = 12;
     private int mPage = 0;
 
     private boolean mLoading = true;
@@ -68,6 +70,8 @@ public class HashTagListFragment extends Fragment {
         mRecycler = (RecyclerView) rootView.findViewById(R.id.tags_list);
         mRecycler.setHasFixedSize(true);
 
+
+        mAvi = (AVLoadingIndicatorView) rootView.findViewById(R.id.avi);
 
         mHashTagsList = new ArrayList<>();
 
@@ -108,6 +112,8 @@ public class HashTagListFragment extends Fragment {
             }
         });
 
+        mAvi.setVisibility(View.VISIBLE);
+
         loadHashTags();
 
     }
@@ -122,7 +128,7 @@ public class HashTagListFragment extends Fragment {
                     String token = task.getResult().getToken();
 
                     IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
-                    Call<List<HashTag>> call = apiService.getHashTags(token, Integer.toString(mLimit), Integer.toString(mPage));
+                    Call<List<HashTag>> call = apiService.getHashTags(token, Integer.toString(mLimit+1), Integer.toString(mPage));
                     call.enqueue(new Callback<List<HashTag>>() {
                         @Override
                         public void onResponse(Call<List<HashTag>> call, Response<List<HashTag>> response) {
@@ -136,12 +142,24 @@ public class HashTagListFragment extends Fragment {
                                     if (mPage==0) {
                                         mHashTagsList.clear();
                                     }
-                                    if (itemsCount >= mLimit)
+                                    if (itemsCount > mLimit) {
                                         mPage++;
-                                    mHashTagsList.addAll(hashtags);
-                                    mAdapter = new HashTagAdapter(getContext(), mHashTagsList);
-                                    mAdapter.notifyDataSetChanged();
-                                    mRecycler.setAdapter(mAdapter);
+                                        hashtags.remove(itemsCount-1);
+                                    }
+
+                                    if (mHashTagsList.size() == 0) {
+                                        mHashTagsList.addAll(hashtags);
+                                        mAdapter = new HashTagAdapter(getContext(), mHashTagsList);
+                                        mRecycler.setAdapter(mAdapter);
+
+                                    } else {
+                                        mHashTagsList.addAll(hashtags);
+                                        mAdapter.notifyDataSetChanged();
+
+                                    }
+
+                                    if (itemsCount > mLimit)
+                                        mPage++;
 
                                 }
 
@@ -149,12 +167,16 @@ public class HashTagListFragment extends Fragment {
 
                                 Log.e(TAG, "500 when creating user: " + response.body());
                             }
+                            mAvi.setVisibility(View.GONE);
+
                         }
 
                         @Override
                         public void onFailure(Call<List<HashTag>> call, Throwable t) {
                             // Log error here since request failed
                             Log.e(TAG, "getting ideas list failed: ");
+                            mAvi.setVisibility(View.GONE);
+
                         }
                     });
 

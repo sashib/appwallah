@@ -16,7 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NewIdeaActivity" />
+        <activity android:name=".NewIdeaActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".HasTagsActivity" />
         <activity android:name=".HashTagIdeasActivity">
             <intent-filter android:label="HashTagLink">

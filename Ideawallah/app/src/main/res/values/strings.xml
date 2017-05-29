@@ -16,6 +16,11 @@
     <string name="days_ago">days ago</string>
     <string name="while_back">A while back</string>
     <string name="hashtags_title">HashTags</string>
+    <string name="idea_hint">Genius idea about to be written...</string>
+    <string name="new_idea_title">New Idea</string>
+    <string name="cancel_idea_message">Exit idea creation?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 
 </resources>

@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,8 @@ public abstract class IdeaListFragment extends Fragment {
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
     private TextView mDefaultText;
+
+    private AVLoadingIndicatorView mAvi;
 
     private List<Idea> mIdeasList;
 
@@ -74,6 +77,8 @@ public abstract class IdeaListFragment extends Fragment {
 
         mDefaultText = (TextView) rootView.findViewById(R.id.default_text);
 
+        mAvi = (AVLoadingIndicatorView) rootView.findViewById(R.id.avi);
+
         mIdeasList = new ArrayList<>();
 
         return rootView;
@@ -95,6 +100,7 @@ public abstract class IdeaListFragment extends Fragment {
         mRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                //Log.v(TAG, "onscroll: " + dy);
                 if(dy > 0) {
                     visibleItemCount = mManager.getChildCount();
                     totalItemCount = mManager.getItemCount();
@@ -107,16 +113,24 @@ public abstract class IdeaListFragment extends Fragment {
                             //Do pagination.. i.e. fetch new data
                             loadIdeas();
 
+                        } else {
+                            mLoading = true;
                         }
                     }
                 }
             }
         });
 
-        loadIdeas();
+        loadIdeasFromStart();
 
     }
 
+    public void loadIdeasFromStart() {
+        mAvi.setVisibility(View.VISIBLE);
+        mIdeasPage = 0;
+        mLoading = true;
+        loadIdeas();
+    }
 
     public void loadIdeas() {
 
@@ -126,6 +140,9 @@ public abstract class IdeaListFragment extends Fragment {
             public void onComplete(@NonNull Task<GetTokenResult> task) {
                 if (task.isSuccessful()) {
                     mToken = task.getResult().getToken();
+
+                    Log.d(TAG, "page is: " + mIdeasPage);
+
                     Call<List<Idea>> call = getIdeas();
                     call.enqueue(new Callback<List<Idea>>() {
                         @Override
@@ -136,30 +153,42 @@ public abstract class IdeaListFragment extends Fragment {
                                 List<Idea> ideas = response.body();
                                 int itemsCount = ideas.size();
                                 if (itemsCount > 0) {
-                                    mDefaultText.setVisibility(View.GONE);
+                                    //mDefaultText.setVisibility(View.GONE);
                                     if (mIdeasPage==0) {
                                         mIdeasList.clear();
                                     }
-                                    if (itemsCount >= mIdeasLimit)
+                                    if (itemsCount > mIdeasLimit) {
                                         mIdeasPage++;
+                                        ideas.remove(itemsCount-1);
+                                    }
 
-                                    mIdeasList.addAll(ideas);
-                                    mAdapter = new IdeaAdapter(getContext(), mIdeasList);
-                                    mAdapter.notifyDataSetChanged();
-                                    mRecycler.setAdapter(mAdapter);
+                                    if (mIdeasList.size() == 0) {
+                                        mIdeasList.addAll(ideas);
+                                        mAdapter = new IdeaAdapter(getContext(), mIdeasList);
+                                        mRecycler.setAdapter(mAdapter);
+
+                                    } else {
+                                        mIdeasList.addAll(ideas);
+                                        mAdapter.notifyDataSetChanged();
+
+                                    }
+
 
                                 }
 
                             } else {
 
-                                Log.e(TAG, "500 when creating user: " + response.body());
+                                Log.e(TAG, "500 when getting ideas: " + response.body());
                             }
+                            mAvi.setVisibility(View.GONE);
                         }
 
                         @Override
                         public void onFailure(Call<List<Idea>> call, Throwable t) {
                             // Log error here since request failed
                             Log.e(TAG, "getting ideas list failed: ");
+                            mAvi.setVisibility(View.GONE);
+
                         }
                     });
 

@@ -1,13 +1,19 @@
 package com.appwallah.ideawallah;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.support.design.widget.FloatingActionButton;
 
@@ -39,16 +45,42 @@ public class NewIdeaActivity extends BaseActivity {
     private static final String TAG = NewIdeaActivity.class.getName();
     private static final String REQUIRED = "Required";
 
-    private EditText mBodyField;
-    private FloatingActionButton mSubmitButton;
+    private EditText mEditText;
+    private Button mSubmitButton;
+
+    public boolean mTextDirty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_idea);
 
-        mBodyField = (EditText) findViewById(R.id.field_body);
-        mSubmitButton = (FloatingActionButton) findViewById(R.id.fab_submit_idea);
+        setTitle(R.string.new_idea_title);
+
+        mTextDirty = false;
+
+        Intent intent = getIntent();
+        String hashtag = intent.getStringExtra(Extras.HASHTAG_EXTRA);
+
+        mEditText = (EditText) findViewById(R.id.idea_text);
+
+        if (hashtag != null) {
+            mEditText.setText(" #" + hashtag);
+        }
+
+        mEditText.setImeActionLabel("Go", KeyEvent.KEYCODE_ENTER);
+        mEditText.setOnKeyListener(new EditText.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                if (((EditText)view).getText().length() > 0 && !mTextDirty)
+                    mTextDirty = true;
+                return false;
+            }
+
+        });
+
+
+        mSubmitButton = (Button) findViewById(R.id.submit_btn);
 
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,11 +91,11 @@ public class NewIdeaActivity extends BaseActivity {
     }
 
     private void submitIdea() {
-        final String body = mBodyField.getText().toString();
+        final String body = mEditText.getText().toString();
 
         // Body is required
         if (TextUtils.isEmpty(body)) {
-            mBodyField.setError(REQUIRED);
+            mEditText.setError(REQUIRED);
             return;
         }
 
@@ -118,7 +150,7 @@ public class NewIdeaActivity extends BaseActivity {
     }
 
     private void setEditingEnabled(boolean enabled) {
-        mBodyField.setEnabled(enabled);
+        mEditText.setEnabled(enabled);
         if (enabled) {
             mSubmitButton.setVisibility(View.VISIBLE);
         } else {
@@ -126,5 +158,29 @@ public class NewIdeaActivity extends BaseActivity {
         }
     }
 
+    private void showDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.cancel_idea_message);
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button
+                finish();
+            }
+        });
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mTextDirty) {
+            showDialog();
+        }
+    }
 
 }

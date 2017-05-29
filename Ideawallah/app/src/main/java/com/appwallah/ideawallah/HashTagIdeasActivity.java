@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.appwallah.ideawallah.fragment.HashTagIdeasFragment;
 import com.appwallah.ideawallah.fragment.HashTagListFragment;
@@ -23,7 +24,7 @@ public class HashTagIdeasActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hash_tag_ideas);
 
-        String hashtag = "";
+        final String hashtag;
 
         Intent intent = getIntent();
         String action = intent.getAction();
@@ -53,5 +54,15 @@ public class HashTagIdeasActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.ideas_fragment, fr).commit();
         }
+
+        findViewById(R.id.fab_new_idea).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HashTagIdeasActivity.this, NewIdeaActivity.class);
+                intent.putExtra(Extras.HASHTAG_EXTRA, hashtag);
+                startActivityForResult(intent, 1);
+            }
+        });
+
     }
 }

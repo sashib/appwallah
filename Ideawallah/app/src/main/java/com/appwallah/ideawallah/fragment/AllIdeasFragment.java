@@ -34,7 +34,7 @@ public class AllIdeasFragment extends IdeaListFragment {
     public Call<List<Idea>> getIdeas() {
 
         IdeawallahApiServiceInterface apiService = IdeawallahApiService.getApiService();
-        return apiService.getIdeas(mToken, Integer.toString(mIdeasLimit), Integer.toString(mIdeasPage));
+        return apiService.getIdeas(mToken, Integer.toString(mIdeasLimit+1), Integer.toString(mIdeasPage));
 
     }
 

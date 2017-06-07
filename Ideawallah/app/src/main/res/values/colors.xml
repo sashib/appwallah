@@ -5,4 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorContentBackground">#EFEFEF</color>
     <color name="colorContentBackgroundLight">#F5F5F5</color>
+    <color name="logo_background">#71cddd</color>
+    <color name="bulb_color">#fff177</color>
+    <color name="dark_gray">#888888</color>
 </resources>

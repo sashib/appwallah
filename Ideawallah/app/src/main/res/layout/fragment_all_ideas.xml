@@ -24,7 +24,7 @@
         android:layout_gravity="center"
         style="@style/AVLoadingIndicatorView.Large"
         android:visibility="visible"
-        app:indicatorName="LineSpinFadeLoaderIndicator"
+        app:indicatorName="BallSpinFadeLoaderIndicator"
         app:indicatorColor="@android:color/darker_gray"  />
 
     <android.support.v7.widget.RecyclerView

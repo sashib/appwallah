@@ -8,25 +8,20 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.appwallah.ideawallah.R;
-import com.appwallah.ideawallah.Utils;
 import com.appwallah.ideawallah.adapters.HashTagAdapter;
-import com.appwallah.ideawallah.adapters.IdeaAdapter;
 import com.appwallah.ideawallah.api.IdeawallahApiService;
 import com.appwallah.ideawallah.api.IdeawallahApiServiceInterface;
 import com.appwallah.ideawallah.models.HashTag;
-import com.appwallah.ideawallah.models.Idea;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
-import com.google.firebase.database.DatabaseReference;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;

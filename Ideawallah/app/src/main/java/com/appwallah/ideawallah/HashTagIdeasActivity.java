@@ -12,6 +12,7 @@ import android.view.View;
 
 import com.appwallah.ideawallah.fragment.HashTagIdeasFragment;
 import com.appwallah.ideawallah.fragment.HashTagListFragment;
+import com.appwallah.ideawallah.fragment.IdeaListFragment;
 
 import java.util.List;
 
@@ -64,5 +65,23 @@ public class HashTagIdeasActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        Log.d(TAG, "reqcode: " + requestCode + ", result: " + resultCode);
+        // Check which request we're responding to
+        if (requestCode == Extras.NEW_IDEA_REQUEST) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+
+                HashTagIdeasFragment fr = (HashTagIdeasFragment)getSupportFragmentManager().findFragmentById(R.id.ideas_fragment);
+                if (fr.getView() != null) {
+                    Log.d(TAG, "fragment isn't null, so will call loadideas");
+                    fr.loadIdeasFromStart();
+                }
+            }
+        }
     }
 }

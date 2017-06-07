@@ -13,20 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.appwallah.ideawallah.MainActivity;
 import com.appwallah.ideawallah.R;
-import com.appwallah.ideawallah.SignInActivity;
-import com.appwallah.ideawallah.Utils;
 import com.appwallah.ideawallah.adapters.IdeaAdapter;
-import com.appwallah.ideawallah.api.IdeawallahApiService;
-import com.appwallah.ideawallah.api.IdeawallahApiServiceInterface;
 import com.appwallah.ideawallah.models.Idea;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
-import com.google.firebase.database.DatabaseReference;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
@@ -153,13 +147,14 @@ public abstract class IdeaListFragment extends Fragment {
                                 List<Idea> ideas = response.body();
                                 int itemsCount = ideas.size();
                                 if (itemsCount > 0) {
-                                    //mDefaultText.setVisibility(View.GONE);
+                                    mDefaultText.setVisibility(View.GONE);
                                     if (mIdeasPage==0) {
                                         mIdeasList.clear();
                                     }
                                     if (itemsCount > mIdeasLimit) {
                                         mIdeasPage++;
                                         ideas.remove(itemsCount-1);
+                                        mLoading = true;
                                     }
 
                                     if (mIdeasList.size() == 0) {
@@ -174,7 +169,11 @@ public abstract class IdeaListFragment extends Fragment {
                                     }
 
 
+                                } else {
+                                    mDefaultText.setVisibility(View.VISIBLE);
+
                                 }
+
 
                             } else {
 

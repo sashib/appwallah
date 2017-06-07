@@ -10,7 +10,7 @@
     <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean nec condimentum ante, quis mattis mi. Proin ut rhoncus libero, ac euismod neque. Ut suscipit, enim a facilisis consequat, orci lacus venenatis orci, at ultricies orci nulla sed ex. In condimentum viverra velit, eget feugiat libero imperdiet vel. Aenean pretium, lectus vitae bibendum bibendum, diam turpis convallis eros, quis tristique leo sapien at ipsum. Praesent eu odio id nulla lobortis auctor. Donec eget dolor eget nisl euismod commodo vel a lacus. Quisque ut justo vitae urna pharetra accumsan. Etiam dignissim neque iaculis mauris viverra, blandit rhoncus odio porttitor. Phasellus nibh arcu.</string>
     <string name="heading_my_ideas">My Ideas</string>
     <string name="hashtag">#</string>
-    <string name="no_ideas">Start Ideating! \n\ntry coming up with ideas for movie scripts, gadgets, party themes, diet</string>
+    <string name="no_ideas">Idea bank is empty</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
     <string name="days_ago">days ago</string>
@@ -21,6 +21,14 @@
     <string name="cancel_idea_message">Exit idea creation?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="tag_line">one who comes up with ideas</string>
+    <string name="tag_line2">Unlock your creativity</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="cancel">Cancel</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="forgot_sent">Reset link sent to your email</string>
+    <string name="name">Name:</string>
+    <string name="update">Update</string>
 
 
 </resources>

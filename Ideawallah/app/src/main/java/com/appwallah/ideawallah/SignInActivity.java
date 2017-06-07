@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appwallah.ideawallah.api.IdeawallahApiService;
@@ -20,8 +21,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,16 +30,21 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
 
     private static final String TAG = "SignInActivity";
 
-    private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
     private String currentUserToken;
 
     private LinearLayout mFormLayout;
     private LinearLayout mButtonsLayout;
+    private LinearLayout mForgotLayout;
+    private LinearLayout mForgotLinkLayout;
     private EditText mEmailField;
     private EditText mPasswordField;
+    private EditText mForgotEmailField;
     private Button mSignInButton;
     private Button mSignUpButton;
+    private Button mForgotButton;
+    private TextView mCancelForgot;
+    private TextView mForgotText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +57,39 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
 
         mFormLayout = (LinearLayout) findViewById(R.id.layout_email_password);
         mButtonsLayout = (LinearLayout) findViewById(R.id.layout_buttons);
+        mForgotLayout = (LinearLayout) findViewById(R.id.forgotLayout);
+        mForgotLinkLayout = (LinearLayout) findViewById(R.id.forgotLinkLayout);
 
         // Views
         mEmailField = (EditText) findViewById(R.id.field_email);
         mPasswordField = (EditText) findViewById(R.id.field_password);
+        mForgotEmailField = (EditText) findViewById(R.id.field_forgot_email);
         mSignInButton = (Button) findViewById(R.id.button_sign_in);
         mSignUpButton = (Button) findViewById(R.id.button_sign_up);
+
+        mForgotText = (TextView) findViewById(R.id.forgotText);
+        mForgotText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                forgotPassword();
+            }
+        });
+
+        mForgotButton = (Button) findViewById(R.id.button_forgot);
+        mForgotButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                doForgotPassword();
+            }
+        });
+
+        mCancelForgot = (TextView) findViewById(R.id.cancelForgotText);
+        mCancelForgot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cancelForgot();
+            }
+        });
 
         // Click listeners
         mSignInButton.setOnClickListener(this);
@@ -75,6 +106,7 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         } else {
             mFormLayout.setVisibility(View.VISIBLE);
             mButtonsLayout.setVisibility(View.VISIBLE);
+            mForgotLinkLayout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -222,5 +254,50 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         } else if (i == R.id.button_sign_up) {
             signUp();
         }
+    }
+
+    public void forgotPassword() {
+        mButtonsLayout.setVisibility(View.GONE);
+        mFormLayout.setVisibility(View.GONE);
+        mForgotLinkLayout.setVisibility(View.GONE);
+
+        mForgotLayout.setVisibility(View.VISIBLE);
+
+    }
+
+    public void doForgotPassword() {
+        String emailAddress = mForgotEmailField.getText().toString();
+
+        if (TextUtils.isEmpty(emailAddress)) {
+            mForgotEmailField.setError("Required");
+            return;
+        } else {
+            mEmailField.setError(null);
+        }
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        auth.sendPasswordResetEmail(emailAddress)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "Email sent.");
+                            Toast.makeText(SignInActivity.this, getString(R.string.forgot_sent),
+                                    Toast.LENGTH_SHORT).show();
+                            cancelForgot();
+                        } else {
+
+                        }
+                    }
+                });
+    }
+
+    public void cancelForgot() {
+        mButtonsLayout.setVisibility(View.VISIBLE);
+        mFormLayout.setVisibility(View.VISIBLE);
+        mForgotLinkLayout.setVisibility(View.VISIBLE);
+
+        mForgotLayout.setVisibility(View.GONE);
+
     }
 }

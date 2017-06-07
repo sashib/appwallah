@@ -14,6 +14,7 @@ import android.widget.ImageView;
 
 import com.appwallah.ideawallah.fragment.AllIdeasFragment;
 import com.appwallah.ideawallah.fragment.IdeaListFragment;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends BaseActivity {
 
@@ -80,7 +81,7 @@ public class MainActivity extends BaseActivity {
 
         Log.d(TAG, "reqcode: " + requestCode + ", result: " + resultCode);
         // Check which request we're responding to
-        if (requestCode == 1) {
+        if (requestCode == Extras.NEW_IDEA_REQUEST) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
 
@@ -96,11 +97,22 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    public void logout() {
+    @Override
+    protected void onResume() {
+        super.onResume();
 
     }
 
+
+    public void logout() {
+        FirebaseAuth.getInstance().signOut();
+        startActivity(new Intent(MainActivity.this, SignInActivity.class));
+        finish();
+    }
+
     public void showProfile() {
+        Intent intent = new Intent(this, ProfileActivity.class);
+        startActivity(intent);
 
     }
 

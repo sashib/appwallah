@@ -36,6 +36,9 @@ public interface IdeawallahApiServiceInterface {
     @POST("users")
     Call<User> createUser(@Header("X-Access-Token") String token, @Body User user);
 
+    @GET("users")
+    Call<User> getUser(@Header("X-Access-Token") String token);
+
     @Headers("Accept: application/json")
     @POST("ideas")
     Call<Idea> createIdea(@Header("X-Access-Token") String token, @Body Idea idea);

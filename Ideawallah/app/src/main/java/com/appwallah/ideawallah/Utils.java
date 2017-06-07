@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -95,18 +96,23 @@ public class Utils {
 
     public static String getIdeaDay(Context ctx, String dt) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date ideaDate;
         String days = "Today";
 
         try {
 
+            //Log.d(TAG, "dt from server is: " + dt);
             ideaDate = dateFormat.parse(dt);
 
-            Calendar c1 = Calendar.getInstance(TimeZone.getTimeZone("UTC")); // today
+            //Log.d(TAG, "idea date from server is: " + ideaDate);
+
+            Calendar c1 = Calendar.getInstance(); // today
+            //Log.d(TAG, "date now in UTC: " + c1);
 
             Calendar c2 = Calendar.getInstance();
-            c2.setTime(ideaDate); // your date
-
+            c2.setTime(ideaDate);
+            //c2.setTimeZone(TimeZone.getTimeZone("UTC"));
             //Log.d(TAG, "c1 is: " + c1.toString());
             //Log.d(TAG, "c2 is: " + c2.toString());
 

@@ -7,4 +7,5 @@ package com.appwallah.ideawallah;
 public class Extras {
 
     public static final String HASHTAG_EXTRA = "hashtag";
+    public static final int NEW_IDEA_REQUEST = 1;
 }

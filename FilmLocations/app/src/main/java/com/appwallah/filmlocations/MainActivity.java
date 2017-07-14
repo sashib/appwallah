@@ -22,7 +22,6 @@ public class MainActivity extends AppCompatActivity implements FilmLocationFragm
 
     @Override
     public void onListFragmentInteraction(FilmLocation item) {
-        Log.d(TAG, "item clicked: " + item.locations);
         Intent intent = new Intent(this, FilmLocationDetailsActivity.class);
         Gson gson = new Gson();
         intent.putExtra(Extras.FILM_LOCATION_EXTRA, gson.toJson(item));

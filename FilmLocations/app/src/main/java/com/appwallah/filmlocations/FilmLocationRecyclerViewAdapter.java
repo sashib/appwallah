@@ -34,15 +34,14 @@ public class FilmLocationRecyclerViewAdapter extends RecyclerView.Adapter<FilmLo
     public void onBindViewHolder(final ViewHolder holder, int position) {
         FilmLocation item = mList.get(position);
 
+        // View with consolidated locations in list item
         /*
         String locations = "";
-
         for (String loc:item.getAllLocations()) {
             if (locations.isEmpty()) {
                 locations = loc;
             } else {
                 locations += "\n" + loc;
-
             }
         }
         if (locations.isEmpty()) {
@@ -51,13 +50,13 @@ public class FilmLocationRecyclerViewAdapter extends RecyclerView.Adapter<FilmLo
             holder.mLocationView.setVisibility(View.VISIBLE);
             holder.mLocationView.setText(locations);
         }
-
         */
-        holder.mLocationView.setText(item.getLocations());
+
 
         holder.mItem = item;
         holder.mFilmView.setText(item.getTitle());
         holder.mDateView.setText(item.getReleaseYear());
+        holder.mLocationView.setText(item.getLocations());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

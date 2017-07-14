@@ -32,6 +32,8 @@ public class FilmLocationDetailsActivity extends AppCompatActivity implements On
 
     public static final String TAG = FilmLocationDetailsActivity.class.getName();
 
+    public static final String SF_CITY_STR = " San Francisco CA";
+
     public FilmLocation mFilmLocation;
     public GoogleMap mMap;
 
@@ -80,8 +82,11 @@ public class FilmLocationDetailsActivity extends AppCompatActivity implements On
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
-        if (!mFilmLocation.getLocations().isEmpty())
-            getGeoCode(mFilmLocation.getLocations());
+        if (mFilmLocation.getLocations() != null) {
+            String location  = mFilmLocation.getLocations() + SF_CITY_STR;
+            getGeoCode(location);
+
+        }
 
     }
 
@@ -96,14 +101,12 @@ public class FilmLocationDetailsActivity extends AppCompatActivity implements On
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 int statusCode = response.code();
                 Log.d(TAG, "status is - " + statusCode);
-
                 if (statusCode == 200) {
                     try {
                         JSONObject json = new JSONObject(response.body().string());
                         JSONObject result = new JSONObject(json.getJSONArray("results").get(0).toString());
                         JSONObject geometry = new JSONObject(result.get("geometry").toString());
                         JSONObject location = new JSONObject(geometry.get("location").toString());
-                        Log.d(TAG, "json is: " + location.get("lat") + ", " + location.get("lng"));
 
                         showMarker(location.getDouble("lat"), location.getDouble("lng"));
 
@@ -128,7 +131,6 @@ public class FilmLocationDetailsActivity extends AppCompatActivity implements On
 
         LatLng loc = new LatLng(lat, lng);
 
-        //map.setMyLocationEnabled(true);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 15));
 
         mMap.addMarker(new MarkerOptions()
